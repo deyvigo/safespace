@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: safespace
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ss-database
+    username: ss-user
+    password: secure-password
+  jpa:
+    hibernate:
+      ddl-auto: update
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+security:
+  jwt:
+    secret-key: miasuperaclaveasecretakasklaslkasdadea32abyasdaasdsdadtes
+    expiration-time: 500000
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.security: DEBUG

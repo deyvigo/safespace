@@ -1,0 +1,10 @@
+services:
+  safespace-database:
+    image: postgres:16
+    container_name: safespace-database
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=ss-user
+      - POSTGRES_PASSWORD=secure-password
+      - POSTGRES_DB=ss-database
