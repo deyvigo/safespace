@@ -1,4 +1,4 @@
-package com.example.safespace_back.dto.in;
+package com.example.safespace_back.dto.out;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,9 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserLoginRequest {
+public class RegisterUserResponse {
+    private Long id;
     private String username;
-    private String password;
     private String name;
     private String lastName;
     private LocalDate birthDay;

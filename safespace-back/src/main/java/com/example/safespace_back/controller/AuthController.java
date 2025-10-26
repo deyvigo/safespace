@@ -1,6 +1,6 @@
 package com.example.safespace_back.controller;
 
-import com.example.safespace_back.dto.in.UserLoginRequest;
+import com.example.safespace_back.dto.in.RegisterUserRequest;
 import com.example.safespace_back.mapper.UserMapper;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.repository.UserRepository;
@@ -29,17 +29,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserLoginRequest userLoginRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest registerUserRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
 
-        UserEntity userEntity = userRepository.findByUsername(userLoginRequest.getUsername()).orElse(null);
+        UserEntity userEntity = userRepository.findByUsername(registerUserRequest.getUsername()).orElse(null);
         if (userEntity != null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username is already in use"));
         }
 
-        userEntity = userMapper.toEntity(userLoginRequest);
+        userEntity = userMapper.toEntity(registerUserRequest);
         return ResponseEntity.ok(userMapper.toResponse(userRepository.save(userEntity)));
     }
 }
