@@ -13,6 +13,8 @@ spring:
   web:
     resources:
       add-mappings: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 
 security:
   jwt:
