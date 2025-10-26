@@ -1,7 +1,7 @@
 package com.example.safespace_back.controller;
 
 import com.example.safespace_back.dto.in.LoginUserDTO;
-import com.example.safespace_back.dto.in.RegisterUserRequest;
+import com.example.safespace_back.dto.in.RegisterUserDTO;
 import com.example.safespace_back.dto.out.JwtDTO;
 import com.example.safespace_back.jwt.JwtService;
 import com.example.safespace_back.mapper.UserMapper;
@@ -25,7 +25,12 @@ public class AuthController {
     private final UserMapper userMapper;
     private final JwtService jwtService;
 
-    public AuthController(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper, JwtService jwtService) {
+    public AuthController(
+        UserRepository userRepository,
+        BCryptPasswordEncoder bCryptPasswordEncoder,
+        UserMapper userMapper,
+        JwtService jwtService
+    ) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
@@ -33,15 +38,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
-        UserEntity userEntity = userRepository.findByUsername(registerUserRequest.getUsername()).orElse(null);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+        UserEntity userEntity = userRepository.findByUsername(registerUserDTO.getUsername()).orElse(null);
 
         if (userEntity != null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username is already in use"));
         }
 
-        userEntity = userMapper.toEntity(registerUserRequest);
-        userEntity.setPassword(bCryptPasswordEncoder.encode(registerUserRequest.getPassword()));
+        userEntity = userMapper.toEntity(registerUserDTO);
+        userEntity.setPassword(bCryptPasswordEncoder.encode(registerUserDTO.getPassword()));
         return ResponseEntity.ok(userMapper.toResponse(userRepository.save(userEntity)));
     }
 

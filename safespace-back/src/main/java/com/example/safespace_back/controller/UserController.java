@@ -1,6 +1,6 @@
 package com.example.safespace_back.controller;
 
-import com.example.safespace_back.dto.out.RegisterUserResponse;
+import com.example.safespace_back.dto.out.RegisterUserDTO;
 import com.example.safespace_back.mapper.UserMapper;
 import com.example.safespace_back.repository.UserRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ public class UserController {
     }
 
     @GetMapping("")
-    public List<RegisterUserResponse> getAllUsers() {
+    public List<RegisterUserDTO> getAllUsers() {
         return userMapper.toResponse(userRepository.findAll());
     }
 }

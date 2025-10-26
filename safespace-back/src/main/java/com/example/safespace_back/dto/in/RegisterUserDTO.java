@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RegisterUserRequest {
+public class RegisterUserDTO {
     private String username;
     private String password;
     private String name;

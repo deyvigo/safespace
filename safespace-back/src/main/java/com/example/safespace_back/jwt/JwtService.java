@@ -24,10 +24,10 @@ public class JwtService {
         Jwt <?, ?> jwt;
         try {
             jwt = Jwts
-                    .parser()
-                    .verifyWith(getSigningtKey())
-                    .build()
-                    .parse(token);
+                .parser()
+                .verifyWith(getSigningtKey())
+                .build()
+                .parse(token);
         } catch (SignatureException se) {
             System.out.println("Invalid JWT signature");
             return null;
@@ -38,11 +38,11 @@ public class JwtService {
 
     public String buildToken(Map<String, Object> claims) {
         return Jwts
-                .builder()
-                .claim("payload", claims)
-                .signWith(getSigningtKey())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .compact();
+            .builder()
+            .claim("payload", claims)
+            .signWith(getSigningtKey())
+            .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .compact();
     }
 
     private SecretKey getSigningtKey() {
@@ -52,10 +52,10 @@ public class JwtService {
     public boolean isValidToken(String token) {
         try {
             Jwts
-                    .parser()
-                    .verifyWith(getSigningtKey())
-                    .build()
-                    .parse(token);
+                .parser()
+                .verifyWith(getSigningtKey())
+                .build()
+                .parse(token);
             return true;
         } catch (Exception e) {
             return false;
