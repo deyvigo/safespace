@@ -1,6 +1,5 @@
-package com.example.safespace_back.config;
+package com.example.safespace_back.config.security;
 
-import com.example.safespace_back.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,7 +35,10 @@ public class SecurityConfiguration {
                 .requestMatchers(
                     "/auth/**",
                     "/user/all",
-                    "/error"
+                    "/error",
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/api-docs"
                 ).permitAll()
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

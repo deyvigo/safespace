@@ -1,4 +1,4 @@
-package com.example.safespace_back.jwt;
+package com.example.safespace_back.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -25,7 +25,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final List<PathPatternRequestMatcher> publicMatchers = Stream.of(
         "/auth/**",
-        "/error"
+        "/error",
+        "/swagger-ui.html",
+        "/swagger-ui/**",
+        "/api-docs"
     ).map(path -> PathPatternRequestMatcher.withDefaults().matcher(path)).toList();
 
 

@@ -1,4 +1,4 @@
-package com.example.safespace_back.jwt;
+package com.example.safespace_back.config.security;
 
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;

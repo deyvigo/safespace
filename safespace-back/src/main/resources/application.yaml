@@ -21,6 +21,10 @@ security:
     secret-key: miasuperaclaveasecretakasklaslkasdadea32abyasdaasdsdadtes
     expiration-time: 500000
 
+springdoc:
+  api-docs:
+    path: /api-docs
+
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

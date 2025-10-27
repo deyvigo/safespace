@@ -1,9 +1,9 @@
 package com.example.safespace_back.controller;
 
 import com.example.safespace_back.dto.in.LoginUserDTO;
-import com.example.safespace_back.dto.in.RegisterUserDTO;
+import com.example.safespace_back.dto.in.RegisterUserRequestDTO;
 import com.example.safespace_back.dto.out.JwtDTO;
-import com.example.safespace_back.jwt.JwtService;
+import com.example.safespace_back.config.security.JwtService;
 import com.example.safespace_back.mapper.UserMapper;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.repository.UserRepository;
@@ -38,27 +38,27 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
-        UserEntity userEntity = userRepository.findByUsername(registerUserDTO.getUsername()).orElse(null);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
+        UserEntity userEntity = userRepository.findByUsername(registerUserRequestDTO.username()).orElse(null);
 
         if (userEntity != null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username is already in use"));
         }
 
-        userEntity = userMapper.toEntity(registerUserDTO);
-        userEntity.setPassword(bCryptPasswordEncoder.encode(registerUserDTO.getPassword()));
+        userEntity = userMapper.toEntity(registerUserRequestDTO);
+        userEntity.setPassword(bCryptPasswordEncoder.encode(registerUserRequestDTO.password()));
         return ResponseEntity.ok(userMapper.toResponse(userRepository.save(userEntity)));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginUserDTO loginUserDTO) {
-        UserEntity userEntity = userRepository.findByUsername(loginUserDTO.getUsername()).orElse(null);
+        UserEntity userEntity = userRepository.findByUsername(loginUserDTO.username()).orElse(null);
 
         if (userEntity == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username not found"));
         }
 
-        if (!bCryptPasswordEncoder.matches(loginUserDTO.getPassword(), userEntity.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(loginUserDTO.password(), userEntity.getPassword())) {
             return ResponseEntity.badRequest().body(Map.of("message", "Password are not correct"));
         }
 
