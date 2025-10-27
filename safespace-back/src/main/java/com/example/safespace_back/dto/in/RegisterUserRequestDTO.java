@@ -1,6 +1,7 @@
 package com.example.safespace_back.dto.in;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
@@ -12,8 +13,9 @@ public record RegisterUserRequestDTO(
     String password,
     @NotBlank(message = "name is required")
     String name,
-    @NotBlank(message = "last name is required")
+    @NotBlank(message = "last_name is required")
     String lastName,
+    @NotNull(message = "birth_day is required")
     @Past(message = "birth_day must be in past")
     LocalDate birthDay
 ) {}

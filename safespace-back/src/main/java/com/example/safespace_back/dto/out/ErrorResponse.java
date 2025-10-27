@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 @Getter
 @Builder
 @AllArgsConstructor
 public class ErrorResponse {
-    private final int status;
+    private final int statusCode;
     private final String code;
     private final String message;
-    private final String details;
+    private final Map<String, ?> details;
 
     public static ErrorResponse of(
         HttpStatus status,
@@ -20,16 +22,16 @@ public class ErrorResponse {
         String message
     ) {
         return ErrorResponse.builder()
-            .status(status.value()).code(code).message(message).build();
+            .statusCode(status.value()).code(code).message(message).build();
     }
 
     public static ErrorResponse of(
         HttpStatus status,
         String code,
         String message,
-        String details
+        Map<String, ?> details
     ) {
         return ErrorResponse.builder()
-            .status(status.value()).code(code).message(message).details(details).build();
+            .statusCode(status.value()).code(code).message(message).details(details).build();
     }
 }

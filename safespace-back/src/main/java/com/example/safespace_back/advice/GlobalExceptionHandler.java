@@ -3,7 +3,6 @@ package com.example.safespace_back.advice;
 import com.example.safespace_back.dto.out.ErrorResponse;
 import com.example.safespace_back.exception.UserInvalidCredentialsException;
 import com.example.safespace_back.exception.UsernameAlreadyUsedException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,20 +10,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        Map<String, Object> body = Map.of(
-            "status", HttpStatus.BAD_REQUEST,
-            "message", ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .toList()
-        );
-        return ResponseEntity.badRequest().body(body);
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
+            .collect(Collectors.toMap(
+                fe -> toSnakeCase(fe.getField()),
+                fe -> Objects.requireNonNullElse(fe.getDefaultMessage(), "Blank error message"),
+                (a, b) -> a)
+            );
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Validation failed", errors));
     }
 
     @ExceptionHandler(UsernameAlreadyUsedException.class)
@@ -37,5 +37,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserInvalidCredentials(UserInvalidCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", ex.getMessage()));
+    }
+
+    private static String toSnakeCase(String field) {
+        return field.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
 }
