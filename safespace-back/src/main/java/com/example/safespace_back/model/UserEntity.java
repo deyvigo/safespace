@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
@@ -18,18 +19,24 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserEntity implements UserDetails {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String username;
     private String password;
     private String name;
     private String lastName;
     private LocalDate birthDay;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_role", nullable = false)
+    private RoleEntity role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role.getRole().name()));
     }
 }
