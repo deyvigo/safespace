@@ -31,7 +31,7 @@ public abstract class UserEntity implements UserDetails {
     private String lastName;
     private LocalDate birthDay;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_role", nullable = false)
     private RoleEntity role;
 
