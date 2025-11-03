@@ -40,6 +40,12 @@ public class SecurityConfiguration {
                     "/swagger-ui/**",
                     "/api-docs"
                 ).permitAll()
+                .requestMatchers(
+                    "/psychologist"
+                ).hasAuthority("PSYCHOLOGIST")
+                .requestMatchers(
+                    "/student"
+                ).hasAuthority("STUDENT")
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

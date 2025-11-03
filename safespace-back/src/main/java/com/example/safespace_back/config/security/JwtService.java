@@ -66,10 +66,8 @@ public class JwtService {
         Object payload = extractPayload(token);
         if (payload instanceof Map<?,?> payloadMap) {
             Object claims = payloadMap.get("payload");
-            System.out.println("Claims: " + claims);
             if (claims instanceof Map<?,?> claimsMap) {
                 Object username = claimsMap.get("username");
-                System.out.println("Username: " + username);
                 return username != null ? username.toString() : null;
             }
         }
