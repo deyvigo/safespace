@@ -1,6 +1,7 @@
 package com.example.safespace_back.advice;
 
 import com.example.safespace_back.dto.out.ErrorResponse;
+import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
 import com.example.safespace_back.exception.UserInvalidCredentialsException;
 import com.example.safespace_back.exception.UsernameAlreadyUsedException;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserInvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleUserInvalidCredentials(UserInvalidCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", ex.getMessage()));
+    }
+
+    @ExceptionHandler(StudentInvalidadIdFacultyException.class)
+    public ResponseEntity<ErrorResponse> handleStudentInvalidadIdFaculty(StudentInvalidadIdFacultyException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", ex.getMessage()));
     }

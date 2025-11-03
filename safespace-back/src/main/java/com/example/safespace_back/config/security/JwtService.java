@@ -25,7 +25,7 @@ public class JwtService {
         try {
             jwt = Jwts
                 .parser()
-                .verifyWith(getSigningtKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parse(token);
         } catch (SignatureException se) {
@@ -40,12 +40,12 @@ public class JwtService {
         return Jwts
             .builder()
             .claim("payload", claims)
-            .signWith(getSigningtKey())
+            .signWith(getSigningKey())
             .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
             .compact();
     }
 
-    private SecretKey getSigningtKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
@@ -53,7 +53,7 @@ public class JwtService {
         try {
             Jwts
                 .parser()
-                .verifyWith(getSigningtKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parse(token);
             return true;
@@ -66,10 +66,8 @@ public class JwtService {
         Object payload = extractPayload(token);
         if (payload instanceof Map<?,?> payloadMap) {
             Object claims = payloadMap.get("payload");
-            System.out.println("Claims: " + claims);
             if (claims instanceof Map<?,?> claimsMap) {
                 Object username = claimsMap.get("username");
-                System.out.println("Username: " + username);
                 return username != null ? username.toString() : null;
             }
         }

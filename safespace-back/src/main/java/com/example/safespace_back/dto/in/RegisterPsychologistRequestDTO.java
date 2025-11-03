@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
-public record RegisterUserRequestDTO(
+public record RegisterPsychologistRequestDTO (
     @NotBlank(message = "username is required")
     String username,
     @NotBlank(message = "password is required")
@@ -17,5 +17,9 @@ public record RegisterUserRequestDTO(
     String lastName,
     @NotNull(message = "birth_day is required")
     @Past(message = "birth_day must be in past")
-    LocalDate birthDay
+    LocalDate birthDay,
+    @NotNull(message = "university is required")
+    String university,
+    @NotNull(message = "university is required")
+    String profession
 ) {}
