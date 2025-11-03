@@ -1,10 +1,11 @@
 package com.example.safespace_back.controller;
 
 import com.example.safespace_back.dto.in.LoginUserDTO;
-import com.example.safespace_back.dto.in.RegisterUserRequestDTO;
+import com.example.safespace_back.dto.in.RegisterPsychologistRequestDTO;
+import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
 import com.example.safespace_back.dto.out.JwtDTO;
-import com.example.safespace_back.dto.out.RegisterUserResponseDTO;
-import com.example.safespace_back.exception.UserInvalidCredentialsException;
+import com.example.safespace_back.dto.out.RegisterPsychologistResponseDTO;
+import com.example.safespace_back.dto.out.RegisterStudentResponseDTO;
 import com.example.safespace_back.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,15 @@ public class AuthController {
 
     public AuthController(AuthService authService) { this.authService = authService; }
 
-    @PostMapping("/register")
-    public ResponseEntity<RegisterUserResponseDTO> registerUser(@Valid @RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
-        RegisterUserResponseDTO userDTO = authService.registerUser(registerUserRequestDTO);
+    @PostMapping("/register/student")
+    public ResponseEntity<RegisterStudentResponseDTO> registerStudent(@Valid @RequestBody RegisterStudentRequestDTO registerStudentRequestDTO) {
+        RegisterStudentResponseDTO userDTO = authService.registerStudent(registerStudentRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+    }
+
+    @PostMapping("/register/psychologist")
+    public ResponseEntity<RegisterPsychologistResponseDTO> registerPsychologist(@Valid @RequestBody RegisterPsychologistRequestDTO registerPsychologistRequestDTO) {
+        RegisterPsychologistResponseDTO userDTO = authService.registerPsychologist(registerPsychologistRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
