@@ -24,10 +24,10 @@ export default function FormDaily() {
   };
 
   return (
-    <div>
+    <div className="bg-white border-black border-2 rounded-2xl p-5 mr-5">
       <div>
         <h1 className="text-blue-950">¿Cómo te sientes hoy?</h1>
-        <p>Selecciona tu estado emocional actual</p>
+        <p className="text-gray-400">Selecciona tu estado emocional actual</p>
       </div>
       <div className="flex flex-wrap justify-center gap-4">
         {emociones.map(({ id, emotion, icon }) => (
