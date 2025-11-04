@@ -38,7 +38,8 @@ public class SecurityConfiguration {
                     "/error",
                     "/swagger-ui.html",
                     "/swagger-ui/**",
-                    "/api-docs"
+                    "/api-docs",
+                    "/faculties"
                 ).permitAll()
                 .requestMatchers(
                     "/psychologist"

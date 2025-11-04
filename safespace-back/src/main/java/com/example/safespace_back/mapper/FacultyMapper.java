@@ -5,7 +5,10 @@ import com.example.safespace_back.model.FacultyEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
+import java.util.List;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FacultyMapper {
-    FacultyDTO toDTO(FacultyEntity entity);
+    FacultyDTO toDTO(FacultyEntity userEntity);
+    List<FacultyDTO> toDTO(List<FacultyEntity> list);
 }
