@@ -5,8 +5,8 @@ export default function Welcome() {
 
   return (
     <div className='text-left'>
-      <p className='text-blue-950 text-3xl'>✨ Bienvenido, {user?.name || 'Invitado'}</p>
-      <p>¿Cómo te sientes hoy? Registra tu estado emocional.</p>
+      <h1 className='text-blue-950 text-3xl'>✨ Bienvenido, {user?.name || 'Invitado'}</h1>
+      <p className='text-gray-400'>¿Cómo te sientes hoy? Registra tu estado emocional.</p>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import Welcome from "../components/Dashboard/WelcomeStudent";
 import FormDaily from "../components/Dashboard/FormDaily";
 import EmotionChart from "../components/Dashboard/EmotionChart";
+import Recommendations from "../components/Dashboard/Recommendations";
+
 export default function Dashboard() {
   return (
     <div className="p-6 h-full w-full">
@@ -9,6 +11,7 @@ export default function Dashboard() {
         <FormDaily />
         <EmotionChart />
       </div>
+      <Recommendations />
     </div>
   );
 }
