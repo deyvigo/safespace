@@ -1,7 +1,9 @@
 package com.example.safespace_back.advice;
 
 import com.example.safespace_back.dto.out.ErrorResponse;
+import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
+import com.example.safespace_back.exception.UnauthorizedAccessException;
 import com.example.safespace_back.exception.UserInvalidCredentialsException;
 import com.example.safespace_back.exception.UsernameAlreadyUsedException;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleStudentInvalidadIdFaculty(StudentInvalidadIdFacultyException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(ErrorResponse.of(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(ErrorResponse.of(HttpStatus.FORBIDDEN, "UNAUTHORIZED_ACCESS", ex.getMessage()));
     }
 
     private static String toSnakeCase(String field) {
