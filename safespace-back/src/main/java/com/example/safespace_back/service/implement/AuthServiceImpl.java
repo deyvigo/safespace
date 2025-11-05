@@ -13,10 +13,7 @@ import com.example.safespace_back.exception.UsernameAlreadyUsedException;
 import com.example.safespace_back.mapper.PsychologistMapper;
 import com.example.safespace_back.mapper.StudentMapper;
 import com.example.safespace_back.model.*;
-import com.example.safespace_back.repository.FacultyRepository;
-import com.example.safespace_back.repository.RoleRepository;
-import com.example.safespace_back.repository.StudentRepository;
-import com.example.safespace_back.repository.UserRepository;
+import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final FacultyRepository facultyRepository;
     private final RoleRepository roleRepository;
     private final StudentRepository studentRepository;
+    private final PsychologistRepository psychologistRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final StudentMapper studentMapper;
     private final PsychologistMapper psychologistMapper;
@@ -39,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
         FacultyRepository facultyRepository,
         RoleRepository roleRepository,
         StudentRepository studentRepository,
+        PsychologistRepository psychologistRepository,
         BCryptPasswordEncoder bCryptPasswordEncoder,
         StudentMapper studentMapper,
         PsychologistMapper psychologistMapper,
@@ -48,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
         this.facultyRepository = facultyRepository;
         this.roleRepository = roleRepository;
         this.studentRepository = studentRepository;
+        this.psychologistRepository = psychologistRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.studentMapper = studentMapper;
         this.psychologistMapper = psychologistMapper;
@@ -84,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(() -> new StudentInvalidadIdFacultyException("role id not found"));
         psychologist.setRole(role);
 
-        return psychologistMapper.toResponse(userRepository.save(psychologist));
+        return psychologistMapper.toResponse(psychologistRepository.save(psychologist));
     }
 
     @Override
