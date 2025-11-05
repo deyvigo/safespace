@@ -114,16 +114,19 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (moodRepository.findAll().isEmpty()) {
-            moodRepository.save(new MoodEntity(null, "muy triste", "😭"));
-            moodRepository.save(new MoodEntity(null, "triste", "😢"));
-            moodRepository.save(new MoodEntity(null, "cansado", "😩"));
-            moodRepository.save(new MoodEntity(null, "estresado", "😣"));
-            moodRepository.save(new MoodEntity(null, "neutral", "😐"));
-            moodRepository.save(new MoodEntity(null, "relajado", "😌"));
-            moodRepository.save(new MoodEntity(null, "feliz", "😊"));
-            moodRepository.save(new MoodEntity(null, "muy feliz", "😁"));
-            moodRepository.save(new MoodEntity(null, "emocionado", "🤩"));
-            moodRepository.save(new MoodEntity(null, "orgulloso", "😎"));
+            moodRepository.saveAll(List.of(
+                MoodEntity.builder().name("muy triste").icon("😭").build(),
+                MoodEntity.builder().name("triste").icon("😢").build(),
+                MoodEntity.builder().name("cansado").icon("😩").build(),
+                MoodEntity.builder().name("estresado").icon("😣").build(),
+                MoodEntity.builder().name("neutral").icon("😐").build(),
+                MoodEntity.builder().name("relajado").icon("😌").build(),
+                MoodEntity.builder().name("feliz").icon("😊").build(),
+                MoodEntity.builder().name("muy feliz").icon("😁").build(),
+                MoodEntity.builder().name("emocionado").icon("🤩").build(),
+                MoodEntity.builder().name("orgulloso").icon("😎").build()
+            ));
         }
+
     }
 }
