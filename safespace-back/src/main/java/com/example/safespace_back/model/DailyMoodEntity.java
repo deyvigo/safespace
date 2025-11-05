@@ -1,6 +1,7 @@
 package com.example.safespace_back.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -8,6 +9,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "daily_mood")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+@Setter
 public class DailyMoodEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

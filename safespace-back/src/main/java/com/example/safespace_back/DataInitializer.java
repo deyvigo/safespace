@@ -10,17 +10,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
     private final FacultyRepository facultyRepository;
     private final RoleRepository roleRepository;
     private final MoodRepository moodRepository;
-    private final StudentRepository studentRepository;
-    private final PsychologistRepository psychologistRepository;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final DailyMoodRepository dailyMoodRepository;
 
     public DataInitializer(
         FacultyRepository facultyRepository,
@@ -29,14 +30,15 @@ public class DataInitializer implements CommandLineRunner {
         StudentRepository studentRepository,
         PsychologistRepository psychologistRepository,
         AuthService authService,
-        UserRepository userRepository) {
+        UserRepository userRepository,
+        DailyMoodRepository dailyMoodRepository
+    ) {
         this.facultyRepository = facultyRepository;
         this.roleRepository = roleRepository;
         this.moodRepository = moodRepository;
-        this.studentRepository = studentRepository;
-        this.psychologistRepository = psychologistRepository;
         this.authService = authService;
         this.userRepository = userRepository;
+        this.dailyMoodRepository = dailyMoodRepository;
     }
 
     @Override
@@ -126,6 +128,21 @@ public class DataInitializer implements CommandLineRunner {
                 MoodEntity.builder().name("emocionado").icon("🤩").build(),
                 MoodEntity.builder().name("orgulloso").icon("😎").build()
             ));
+        }
+
+        List<MoodEntity> moods = moodRepository.findAll();
+        List<StudentEntity> students = userRepository.findAll().stream()
+            .filter(u -> u.getRole().getRole().name().equals("STUDENT"))
+            .map(u -> (StudentEntity) u)
+            .toList();
+
+
+        if (dailyMoodRepository.findAll().isEmpty()) {
+            dailyMoodRepository.saveAll(
+                List.of(
+                    DailyMoodEntity.builder().createdAt(LocalDateTime.now()).description("ASDASDASD").student(students.get(0)).moods(Set.of(moods.get(0), moods.get(2))).build()
+                )
+            );
         }
 
     }
