@@ -1,22 +1,42 @@
 package com.example.safespace_back;
 
-import com.example.safespace_back.model.FacultyEntity;
-import com.example.safespace_back.model.Role;
-import com.example.safespace_back.model.RoleEntity;
-import com.example.safespace_back.repository.FacultyRepository;
-import com.example.safespace_back.repository.RoleRepository;
+import com.example.safespace_back.dto.in.RegisterPsychologistRequestDTO;
+import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
+import com.example.safespace_back.model.*;
+import com.example.safespace_back.repository.*;
+import com.example.safespace_back.service.AuthService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
     private final FacultyRepository facultyRepository;
     private final RoleRepository roleRepository;
+    private final MoodRepository moodRepository;
+    private final StudentRepository studentRepository;
+    private final PsychologistRepository psychologistRepository;
+    private final AuthService authService;
+    private final UserRepository userRepository;
 
-    public DataInitializer(FacultyRepository facultyRepository, RoleRepository roleRepository) {
+    public DataInitializer(
+        FacultyRepository facultyRepository,
+        RoleRepository roleRepository,
+        MoodRepository moodRepository,
+        StudentRepository studentRepository,
+        PsychologistRepository psychologistRepository,
+        AuthService authService,
+        UserRepository userRepository) {
         this.facultyRepository = facultyRepository;
         this.roleRepository = roleRepository;
+        this.moodRepository = moodRepository;
+        this.studentRepository = studentRepository;
+        this.psychologistRepository = psychologistRepository;
+        this.authService = authService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -31,6 +51,79 @@ public class DataInitializer implements CommandLineRunner {
             facultyRepository.save(new FacultyEntity(null, "Facultad de Ingeniería de Sistemas e Informática"));
             facultyRepository.save(new FacultyEntity(null, "Facultad de Ingeniería Industriale"));
             facultyRepository.save(new FacultyEntity(null, "Facultad de Ciencias Físicas"));
+        }
+
+        List<FacultyEntity> faculties = facultyRepository.findAll();
+
+        if (userRepository.findAll().isEmpty()) {
+            authService.registerStudent(
+                 new RegisterStudentRequestDTO(
+                    "jhondoe",
+                    "123456",
+                    "Jhon",
+                    "Doe",
+                    LocalDate.parse("2001-11-06"),
+                    faculties.get(1).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "janedoe",
+                    "123456",
+                    "Jane",
+                    "Doe",
+                    LocalDate.parse("2000-03-15"),
+                    faculties.get(2).getId()
+                )
+            );
+
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "mikebrown",
+                    "123456",
+                    "Mike",
+                    "Brown",
+                    LocalDate.parse("1999-07-22"),
+                    faculties.get(0).getId()
+                )
+            );
+
+            authService.registerPsychologist(
+                new RegisterPsychologistRequestDTO(
+                    "mindcoach",
+                    "123456",
+                    "Laura",
+                    "Gonzales",
+                    LocalDate.parse("1988-05-23"),
+                    "Pontificia Universidad Católica del Perú",
+                    "Psicóloga Clínica"
+                )
+            );
+
+            authService.registerPsychologist(
+                new RegisterPsychologistRequestDTO(
+                    "therapist01",
+                    "123456",
+                    "Carlos",
+                    "Ramírez",
+                    LocalDate.parse("1992-09-10"),
+                    "Universidad Peruana Cayetano Heredia",
+                    "Psicólogo Educativo"
+                )
+            );
+        }
+
+        if (moodRepository.findAll().isEmpty()) {
+            moodRepository.save(new MoodEntity(null, "muy triste", "😭"));
+            moodRepository.save(new MoodEntity(null, "triste", "😢"));
+            moodRepository.save(new MoodEntity(null, "cansado", "😩"));
+            moodRepository.save(new MoodEntity(null, "estresado", "😣"));
+            moodRepository.save(new MoodEntity(null, "neutral", "😐"));
+            moodRepository.save(new MoodEntity(null, "relajado", "😌"));
+            moodRepository.save(new MoodEntity(null, "feliz", "😊"));
+            moodRepository.save(new MoodEntity(null, "muy feliz", "😁"));
+            moodRepository.save(new MoodEntity(null, "emocionado", "🤩"));
+            moodRepository.save(new MoodEntity(null, "orgulloso", "😎"));
         }
     }
 }

@@ -45,7 +45,8 @@ public class SecurityConfiguration {
                     "/psychologist"
                 ).hasAuthority("PSYCHOLOGIST")
                 .requestMatchers(
-                    "/student"
+                    "/student",
+                    "/moods"
                 ).hasAuthority("STUDENT")
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
