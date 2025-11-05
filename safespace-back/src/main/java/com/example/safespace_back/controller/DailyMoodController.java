@@ -1,12 +1,13 @@
 package com.example.safespace_back.controller;
 
+import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
+import com.example.safespace_back.dto.out.DailyMoodDTO;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.service.DailyMoodService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -23,5 +24,10 @@ public class DailyMoodController {
     public ResponseEntity<Map<String, Boolean>> checkMood(@AuthenticationPrincipal UserEntity user) {
         boolean check = dailyMoodService.checkIfAlreadyRegisteredDailyMoodToday(user.getId());
         return ResponseEntity.ok(Map.of("completed", check));
+    }
+
+    @PostMapping("")
+    public ResponseEntity<DailyMoodDTO> registerDailyMood(@Valid @RequestBody DailyMoodRequestDTO dto, @AuthenticationPrincipal UserEntity user) {
+        return ResponseEntity.ok(dailyMoodService.registerDailyMoodToday(dto, user));
     }
 }
