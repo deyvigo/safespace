@@ -1,6 +1,6 @@
 export default function RecommendationBox({ icon, title, description }) {
   return (
-    <div className="flex flex-row items-center justify-center">
+    <div className="flex flex-row p-4 items-center border-gray-500 border-2 rounded-2xl">
       <div className="">
         {/* icon */}
         <p className="text-5xl m-2">💝</p>
