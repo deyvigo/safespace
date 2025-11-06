@@ -42,7 +42,8 @@ public class SecurityConfiguration {
                     "/faculties"
                 ).permitAll()
                 .requestMatchers(
-                    "/psychologist"
+                    "/psychologist",
+                    "/sentences/**"
                 ).hasAuthority("PSYCHOLOGIST")
                 .requestMatchers(
                     "/student",
