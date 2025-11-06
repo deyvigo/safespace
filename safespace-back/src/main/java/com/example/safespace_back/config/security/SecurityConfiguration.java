@@ -42,10 +42,13 @@ public class SecurityConfiguration {
                     "/faculties"
                 ).permitAll()
                 .requestMatchers(
-                    "/psychologist"
+                    "/psychologist",
+                    "/sentences/**"
                 ).hasAuthority("PSYCHOLOGIST")
                 .requestMatchers(
-                    "/student"
+                    "/student",
+                    "/moods",
+                    "/dailymoods/**"
                 ).hasAuthority("STUDENT")
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

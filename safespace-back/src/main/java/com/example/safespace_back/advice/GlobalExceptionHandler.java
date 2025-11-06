@@ -1,11 +1,7 @@
 package com.example.safespace_back.advice;
 
 import com.example.safespace_back.dto.out.ErrorResponse;
-import com.example.safespace_back.exception.ResourceNotFoundException;
-import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
-import com.example.safespace_back.exception.UnauthorizedAccessException;
-import com.example.safespace_back.exception.UserInvalidCredentialsException;
-import com.example.safespace_back.exception.UsernameAlreadyUsedException;
+import com.example.safespace_back.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
