@@ -7,7 +7,7 @@ import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
 import com.example.safespace_back.dto.out.JwtDTO;
 import com.example.safespace_back.dto.out.RegisterPsychologistResponseDTO;
 import com.example.safespace_back.dto.out.RegisterStudentResponseDTO;
-import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
+import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.exception.UserInvalidCredentialsException;
 import com.example.safespace_back.exception.UsernameAlreadyUsedException;
 import com.example.safespace_back.mapper.PsychologistMapper;
@@ -63,10 +63,10 @@ public class AuthServiceImpl implements AuthService {
         StudentEntity student = studentMapper.toEntity(dto);
         student.setPassword(bCryptPasswordEncoder.encode(dto.password()));
         FacultyEntity faculty = facultyRepository.findById(dto.idFaculty())
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("id_faculty not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_faculty not found"));
         student.setFaculty(faculty);
         RoleEntity role = roleRepository.findByRole(Role.STUDENT)
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("id_role not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         student.setRole(role);
 
         return studentMapper.toResponse(studentRepository.save(student));
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
         PsychologistEntity psychologist = psychologistMapper.toEntity(dto);
         psychologist.setPassword(bCryptPasswordEncoder.encode(dto.password()));
         RoleEntity role = roleRepository.findByRole(Role.PSYCHOLOGIST)
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("role id not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         psychologist.setRole(role);
 
         return psychologistMapper.toResponse(psychologistRepository.save(psychologist));
