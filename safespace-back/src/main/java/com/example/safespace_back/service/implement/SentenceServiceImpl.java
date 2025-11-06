@@ -44,18 +44,26 @@ public class SentenceServiceImpl implements SentenceService {
 
     @Override
     public void delete(Long id, UserEntity user) {
+        SentenceEntity sentence = findIfOwnerOrThrow(id, user);
+        sentenceRepository.delete(sentence);
+    }
+
+    @Override
+    public SentenceResponseDTO update(Long id, SentenceRequestDTO dto, UserEntity user) {
+        SentenceEntity sentence = findIfOwnerOrThrow(id, user);
+        sentence.setContent(dto.content());
+        return sentenceMapper.toOutDTO(sentenceRepository.save(sentence));
+    }
+
+    private SentenceEntity findIfOwnerOrThrow(Long id, UserEntity user) {
         SentenceEntity sentence = sentenceRepository.findById(id).orElseThrow(
             () -> new ResourceNotFoundException("cannot find sentence with id: " + id)
         );
 
         PsychologistEntity psychologist = sentence.getPsychologist();
-        if (psychologist == null) {
-            throw new UnauthorizedAccessException("User can't delete this sentence because it's not the owner");
+        if (psychologist == null || !psychologist.getId().equals(user.getId())) {
+            throw new UnauthorizedAccessException("User can't access this sentence because it's not the owner");
         }
-        if (!psychologist.getId().equals(user.getId())) {
-            throw new UnauthorizedAccessException("User can't delete this sentence because it's not the owner");
-        }
-
-        sentenceRepository.delete(sentence);
+        return sentence;
     }
 }

@@ -35,4 +35,13 @@ public class SentenceController {
         sentenceService.delete(idSentence, user);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{idSentence}")
+    public ResponseEntity<SentenceResponseDTO> patch(
+        @Valid @RequestBody SentenceRequestDTO dto,
+        @PathVariable("idSentence") Long idSentence,
+        @AuthenticationPrincipal UserEntity user
+    ) {
+        return ResponseEntity.ok(sentenceService.update(idSentence, dto, user));
+    }
 }
