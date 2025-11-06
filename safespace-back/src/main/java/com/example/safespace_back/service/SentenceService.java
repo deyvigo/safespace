@@ -9,4 +9,5 @@ import java.util.List;
 public interface SentenceService {
     SentenceResponseDTO create(SentenceRequestDTO dto, UserEntity user);
     List<SentenceResponseDTO> findAll();
+    void delete(Long id, UserEntity user);
 }

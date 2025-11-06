@@ -29,4 +29,10 @@ public class SentenceController {
     public ResponseEntity<List<SentenceResponseDTO>> findAll() {
         return ResponseEntity.ok(sentenceService.findAll());
     }
+
+    @DeleteMapping("/{idSentence}")
+    public ResponseEntity<Void> delete(@PathVariable("idSentence") Long idSentence, @AuthenticationPrincipal UserEntity user) {
+        sentenceService.delete(idSentence, user);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,7 +1,8 @@
 package com.example.safespace_back.dto.out;
 
-public record SentenceResponseDTO(
+public record SentenceResponseDTO (
     Long id,
-    String content
+    String content,
+    PsychologistDTO psychologist
 ) {
 }

@@ -2,6 +2,8 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.in.SentenceRequestDTO;
 import com.example.safespace_back.dto.out.SentenceResponseDTO;
+import com.example.safespace_back.exception.ResourceNotFoundException;
+import com.example.safespace_back.exception.UnauthorizedAccessException;
 import com.example.safespace_back.mapper.SentenceMapper;
 import com.example.safespace_back.model.PsychologistEntity;
 import com.example.safespace_back.model.SentenceEntity;
@@ -38,5 +40,22 @@ public class SentenceServiceImpl implements SentenceService {
     @Override
     public List<SentenceResponseDTO> findAll() {
         return sentenceMapper.toOutDTO(sentenceRepository.findAll());
+    }
+
+    @Override
+    public void delete(Long id, UserEntity user) {
+        SentenceEntity sentence = sentenceRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("cannot find sentence with id: " + id)
+        );
+
+        PsychologistEntity psychologist = sentence.getPsychologist();
+        if (psychologist == null) {
+            throw new UnauthorizedAccessException("User can't delete this sentence because it's not the owner");
+        }
+        if (!psychologist.getId().equals(user.getId())) {
+            throw new UnauthorizedAccessException("User can't delete this sentence because it's not the owner");
+        }
+
+        sentenceRepository.delete(sentence);
     }
 }

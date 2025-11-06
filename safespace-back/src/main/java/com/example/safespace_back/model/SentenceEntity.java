@@ -17,6 +17,6 @@ public class SentenceEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_psychologist")
+    @JoinColumn(name = "id_psychologist", nullable = true)
     private PsychologistEntity psychologist;
 }
