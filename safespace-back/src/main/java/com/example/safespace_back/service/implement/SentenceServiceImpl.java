@@ -10,6 +10,8 @@ import com.example.safespace_back.repository.SentenceRepository;
 import com.example.safespace_back.service.SentenceService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SentenceServiceImpl implements SentenceService {
     private final SentenceRepository sentenceRepository;
@@ -31,5 +33,10 @@ public class SentenceServiceImpl implements SentenceService {
                 .psychologist((PsychologistEntity) user)
                 .build()
         ));
+    }
+
+    @Override
+    public List<SentenceResponseDTO> findAll() {
+        return sentenceMapper.toOutDTO(sentenceRepository.findAll());
     }
 }
