@@ -1,6 +1,7 @@
 package com.example.safespace_back.controller;
 
 import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
+import com.example.safespace_back.dto.out.DailyMoodCompletedDTO;
 import com.example.safespace_back.dto.out.DailyMoodDTO;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.service.DailyMoodService;
@@ -21,9 +22,8 @@ public class DailyMoodController {
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Map<String, Boolean>> checkMood(@AuthenticationPrincipal UserEntity user) {
-        boolean check = dailyMoodService.checkIfAlreadyRegisteredDailyMoodToday(user.getId());
-        return ResponseEntity.ok(Map.of("completed", check));
+    public ResponseEntity<DailyMoodCompletedDTO> checkMood(@AuthenticationPrincipal UserEntity user) {
+        return ResponseEntity.ok(dailyMoodService.checkIfAlreadyRegisteredDailyMoodToday(user.getId()));
     }
 
     @PostMapping("")

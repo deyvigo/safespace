@@ -1,6 +1,7 @@
 package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
+import com.example.safespace_back.dto.out.DailyMoodCompletedDTO;
 import com.example.safespace_back.dto.out.DailyMoodDTO;
 import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.mapper.DailyMoodMapper;
@@ -34,9 +35,9 @@ public class DailyMoodServiceImpl implements DailyMoodService {
     }
 
     @Override
-    public boolean checkIfAlreadyRegisteredDailyMoodToday(Long id) {
+    public DailyMoodCompletedDTO checkIfAlreadyRegisteredDailyMoodToday(Long id) {
         DailyMoodEntity dailyMoodEntity = dailyMoodRepository.findByStudent_Id(id).orElse(null);
-        return dailyMoodEntity != null;
+        return new DailyMoodCompletedDTO(dailyMoodEntity != null);
     }
 
     @Override
