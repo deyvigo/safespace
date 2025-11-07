@@ -19,7 +19,7 @@ spring:
 security:
   jwt:
     secret-key: miasuperaclaveasecretakasklaslkasdadea32abyasdaasdsdadtes
-    expiration-time: 500000
+    expiration-time: 604800000
 
 springdoc:
   api-docs:
