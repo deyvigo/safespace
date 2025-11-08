@@ -3,6 +3,7 @@ package com.example.safespace_back.advice;
 import com.example.safespace_back.dto.out.ErrorResponse;
 
 import com.example.safespace_back.exception.*;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
