@@ -1,25 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EmotionBox from "./EmotionBox";
+import useDailyMoodCheck from "../../hooks/DailyMoods/useDailyMoodCheck";
+import useGetMoods from "../../hooks/DailyMoods/useGetMoods";
+import useSubmitDailyMood from "../../hooks/DailyMoods/useSubmitDailyMood";
 
 export default function FormDaily() {
-  const emociones = [
-    { id: 1, emotion: "Feliz", icon: "😊" },
-    { id: 2, emotion: "Triste", icon: "😢" },
-    { id: 3, emotion: "Enojado", icon: "😠" },
-    { id: 4, emotion: "Ansioso", icon: "😰" },
-    { id: 5, emotion: "Motivado", icon: "😎" },
-  ];
+  const emociones = useGetMoods();
+  const { sendMood, loadingS, errorS, success } = useSubmitDailyMood();
+  useEffect(() => {
+    if (success) {
+      setFormularioEnviado(true);
+    }
+  }, [success]);
 
   const [seleccionadas, setSeleccionadas] = useState([]);
   const [estadoRegistrado, setEstadoRegistrado] = useState(false);
   const [textoDia, setTextoDia] = useState("");
   const [formularioEnviado, setFormularioEnviado] = useState(false);
+  const { data, loading, error } = useDailyMoodCheck();
 
-  const toggleEmocion = (emocion) => {
-    if (seleccionadas.includes(emocion)) {
-      setSeleccionadas(seleccionadas.filter((e) => e !== emocion));
+  const toggleEmocion = (id) => {
+    if (seleccionadas.includes(id)) {
+      setSeleccionadas(seleccionadas.filter((e) => e !== id));
     } else {
-      setSeleccionadas([...seleccionadas, emocion]);
+      setSeleccionadas([...seleccionadas, id]);
     }
   };
 
@@ -34,21 +38,21 @@ export default function FormDaily() {
   };
 
   return (
-    <div className="flex flex-col flex-2 bg-white border-black border-2 rounded-2xl p-5 mr-5">
-      {!estadoRegistrado && (
+    <div className="flex flex-col justify-center flex-2 bg-white border-black border-2 rounded-2xl p-5 mr-5">
+      {!data?.completed && !estadoRegistrado && (
         <>
           <h2 className="text-blue-950 text-3xl">¿Cómo te sientes hoy?</h2>
           <p className="text-gray-400 mb-4">
             Selecciona tu estado emocional actual
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-6">
-            {emociones.map(({ id, emotion, icon }) => (
+            {emociones.map(({ id, name, icon }) => (
               <EmotionBox
                 key={id}
-                emotion={emotion}
+                emotion={name}
                 icon={icon}
-                selected={seleccionadas.includes(emotion)}
-                onToggle={() => toggleEmocion(emotion)}
+                selected={seleccionadas.includes(id)}
+                onToggle={() => toggleEmocion(id)}
               />
             ))}
           </div>
@@ -83,15 +87,17 @@ export default function FormDaily() {
           <button
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full"
             type="button"
-            onClick={enviarFormulario}
+            onClick={() =>
+              sendMood({ moods: seleccionadas, description: textoDia })
+            }
           >
             Enviar formulario
           </button>
         </div>
       )}
 
-      {formularioEnviado && (
-        <div className="mt-6 text-center">
+      {(data?.completed || formularioEnviado) && (
+        <div className="flex flex-col justify-center self-center text-center h-50">
           <h2 className="text-green-600 text-2xl font-semibold">
             ¡Gracias por compartir tu día!
           </h2>

@@ -1,7 +1,8 @@
 export default function EmotionBox({ emotion, icon, selected, onToggle }) {
   return (
-    <div>
+    <div className="">
       <button
+        className="w-30 h-25"
         type="button"
         onClick={onToggle}
         style={{

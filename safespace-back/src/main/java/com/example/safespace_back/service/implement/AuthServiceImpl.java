@@ -7,16 +7,13 @@ import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
 import com.example.safespace_back.dto.out.JwtDTO;
 import com.example.safespace_back.dto.out.RegisterPsychologistResponseDTO;
 import com.example.safespace_back.dto.out.RegisterStudentResponseDTO;
-import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
+import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.exception.UserInvalidCredentialsException;
 import com.example.safespace_back.exception.UsernameAlreadyUsedException;
 import com.example.safespace_back.mapper.PsychologistMapper;
 import com.example.safespace_back.mapper.StudentMapper;
 import com.example.safespace_back.model.*;
-import com.example.safespace_back.repository.FacultyRepository;
-import com.example.safespace_back.repository.RoleRepository;
-import com.example.safespace_back.repository.StudentRepository;
-import com.example.safespace_back.repository.UserRepository;
+import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final FacultyRepository facultyRepository;
     private final RoleRepository roleRepository;
     private final StudentRepository studentRepository;
+    private final PsychologistRepository psychologistRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final StudentMapper studentMapper;
     private final PsychologistMapper psychologistMapper;
@@ -39,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
         FacultyRepository facultyRepository,
         RoleRepository roleRepository,
         StudentRepository studentRepository,
+        PsychologistRepository psychologistRepository,
         BCryptPasswordEncoder bCryptPasswordEncoder,
         StudentMapper studentMapper,
         PsychologistMapper psychologistMapper,
@@ -48,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
         this.facultyRepository = facultyRepository;
         this.roleRepository = roleRepository;
         this.studentRepository = studentRepository;
+        this.psychologistRepository = psychologistRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.studentMapper = studentMapper;
         this.psychologistMapper = psychologistMapper;
@@ -63,10 +63,10 @@ public class AuthServiceImpl implements AuthService {
         StudentEntity student = studentMapper.toEntity(dto);
         student.setPassword(bCryptPasswordEncoder.encode(dto.password()));
         FacultyEntity faculty = facultyRepository.findById(dto.idFaculty())
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("id_faculty not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_faculty not found"));
         student.setFaculty(faculty);
         RoleEntity role = roleRepository.findByRole(Role.STUDENT)
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("id_role not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         student.setRole(role);
 
         return studentMapper.toResponse(studentRepository.save(student));
@@ -81,10 +81,10 @@ public class AuthServiceImpl implements AuthService {
         PsychologistEntity psychologist = psychologistMapper.toEntity(dto);
         psychologist.setPassword(bCryptPasswordEncoder.encode(dto.password()));
         RoleEntity role = roleRepository.findByRole(Role.PSYCHOLOGIST)
-            .orElseThrow(() -> new StudentInvalidadIdFacultyException("role id not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         psychologist.setRole(role);
 
-        return psychologistMapper.toResponse(userRepository.save(psychologist));
+        return psychologistMapper.toResponse(psychologistRepository.save(psychologist));
     }
 
     @Override

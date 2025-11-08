@@ -1,15 +1,16 @@
 package com.example.safespace_back.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "mood")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class MoodEntity {
@@ -18,4 +19,7 @@ public class MoodEntity {
     private Long id;
     private String name;
     private String icon;
+
+    @ManyToMany(mappedBy = "moods")
+    private Set<DailyMoodEntity> dailyMoods = new HashSet<>();
 }
