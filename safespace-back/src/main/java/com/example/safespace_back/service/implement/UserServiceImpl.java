@@ -1,21 +1,29 @@
 package com.example.safespace_back.service.implement;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.safespace_back.dto.in.UpdatePsychologistRequestDTO;
 import com.example.safespace_back.dto.in.UpdateStudentRequestDTO;
+import com.example.safespace_back.dto.out.DigitalResourceResponseDTO;
 import com.example.safespace_back.dto.out.PsychologistDTO;
 import com.example.safespace_back.dto.out.StudentDTO;
 import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.exception.StudentInvalidadIdFacultyException;
 import com.example.safespace_back.exception.UnauthorizedAccessException;
+import com.example.safespace_back.mapper.DigitalResourceMapper;
 import com.example.safespace_back.mapper.PsychologistMapper;
 import com.example.safespace_back.mapper.StudentMapper;
+import com.example.safespace_back.model.DigitalResourcesEntity;
 import com.example.safespace_back.model.FacultyEntity;
 import com.example.safespace_back.model.PsychologistEntity;
 import com.example.safespace_back.model.Role;
 import com.example.safespace_back.model.StudentEntity;
 import com.example.safespace_back.model.UserEntity;
+import com.example.safespace_back.repository.DigitalResourcesRepository;
 import com.example.safespace_back.repository.FacultyRepository;
 import com.example.safespace_back.repository.UserRepository;
 import com.example.safespace_back.service.UserService;
@@ -30,6 +38,8 @@ public class UserServiceImpl implements UserService {
   private final StudentMapper studentMapper;
   private final PsychologistMapper psychologistMapper;
   private final FacultyRepository facultyRepository;
+  private final DigitalResourcesRepository digitalResourcesRepository;
+  private final DigitalResourceMapper digitalResourceMapper;
 
   @Override
   public Object findByUsername(String username, UserEntity currentUser) {
@@ -104,6 +114,40 @@ public class UserServiceImpl implements UserService {
     
     PsychologistEntity savedPsychologist = (PsychologistEntity) userRepository.save(psychologist);
     return psychologistMapper.toPsychologistDTO(savedPsychologist);
+  }
+
+  @Override
+  @Transactional
+  public void addFavoriteResource(UserEntity currentUser, Long resourceId) {
+    UserEntity user = userRepository.findById(currentUser.getId())
+      .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    DigitalResourcesEntity resource = digitalResourcesRepository.findById(resourceId)
+      .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+
+    user.getFavoriteResources().add(resource);
+    userRepository.save(user);
+  }
+
+  @Override
+  @Transactional
+  public void removeFavoriteResource(UserEntity currentUser, Long resourceId) {
+    UserEntity user = userRepository.findById(currentUser.getId())
+      .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    user.getFavoriteResources().removeIf(r -> r.getId().equals(resourceId));
+    userRepository.save(user);
+  }
+
+  @Override
+  @Transactional
+  public List<DigitalResourceResponseDTO> getFavoriteResources(UserEntity currentUser) {
+    UserEntity user = userRepository.findById(currentUser.getId())
+      .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    return user.getFavoriteResources().stream()
+      .map(digitalResourceMapper::toDTO)
+      .toList();
   }
 
 }

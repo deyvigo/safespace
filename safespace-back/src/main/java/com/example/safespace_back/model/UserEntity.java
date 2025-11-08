@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -34,6 +36,14 @@ public abstract class UserEntity implements UserDetails {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_role", nullable = false)
     private RoleEntity role;
+
+    @ManyToMany
+    @JoinTable(
+      name = "user_favorite_digital_resources",
+      joinColumns = @JoinColumn(columnDefinition = "user_id"),
+      inverseJoinColumns = @JoinColumn(columnDefinition = "resource_id")
+    )
+    private Set<DigitalResourcesEntity> favoriteResources = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

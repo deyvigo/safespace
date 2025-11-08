@@ -1,5 +1,8 @@
 package com.example.safespace_back.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,4 +29,7 @@ public class DigitalResourcesEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_psychologist")
     private PsychologistEntity psychologist;
+
+    @ManyToMany(mappedBy = "favoriteResources")
+    private Set<UserEntity> favoritedBy = new HashSet<>();
 }
