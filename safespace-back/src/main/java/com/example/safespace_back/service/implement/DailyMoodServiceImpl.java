@@ -14,6 +14,7 @@ import com.example.safespace_back.repository.MoodRepository;
 import com.example.safespace_back.service.DailyMoodService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,10 @@ public class DailyMoodServiceImpl implements DailyMoodService {
 
     @Override
     public DailyMoodCompletedDTO checkIfAlreadyRegisteredDailyMoodToday(Long id) {
-        DailyMoodEntity dailyMoodEntity = dailyMoodRepository.findByStudent_Id(id).orElse(null);
+        LocalDate actualDay = LocalDateTime.now().toLocalDate();
+        LocalDateTime startDate = actualDay.atTime(0, 0);
+        LocalDateTime endDate = actualDay.atTime(23, 59);
+        DailyMoodEntity dailyMoodEntity = dailyMoodRepository.findByCreatedAtBetweenAndStudent_Id(startDate, endDate, id).orElse(null);
         return new DailyMoodCompletedDTO(dailyMoodEntity != null);
     }
 
