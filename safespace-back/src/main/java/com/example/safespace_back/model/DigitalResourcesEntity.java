@@ -16,11 +16,14 @@ public class DigitalResourcesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;
-    private String link;
-    private String cover;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    private String title;
+    private String description;
+    private CategoryDigitalResource category;
+    private TypeDigitalResource type;
+    private String link;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_psychologist")
     private PsychologistEntity psychologist;
 }

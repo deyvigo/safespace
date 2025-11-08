@@ -1,13 +1,18 @@
 package com.example.safespace_back.advice;
 
 import com.example.safespace_back.dto.out.ErrorResponse;
+
 import com.example.safespace_back.exception.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -59,4 +64,23 @@ public class GlobalExceptionHandler {
     private static String toSnakeCase(String field) {
         return field.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        String message = "Invalid request body format";
+        
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+            if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
+                message = String.format("Invalid value '%s' for field '%s'. Accepted values are: %s",
+                        ifx.getValue(),
+                        ifx.getPath().get(ifx.getPath().size()-1).getFieldName(),
+                        Arrays.toString(ifx.getTargetType().getEnumConstants()));
+            }
+        }
+        
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "INVALID_REQUEST_BODY", message));
+    }
+
 }
