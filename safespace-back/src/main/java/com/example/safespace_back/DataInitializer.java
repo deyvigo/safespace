@@ -22,6 +22,7 @@ public class DataInitializer implements CommandLineRunner {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final DailyMoodRepository dailyMoodRepository;
+    private final DigitalResourcesRepository digitalResourcesRepository;
 
     public DataInitializer(
         FacultyRepository facultyRepository,
@@ -31,7 +32,8 @@ public class DataInitializer implements CommandLineRunner {
         PsychologistRepository psychologistRepository,
         AuthService authService,
         UserRepository userRepository,
-        DailyMoodRepository dailyMoodRepository
+        DailyMoodRepository dailyMoodRepository,
+        DigitalResourcesRepository digitalResourcesRepository
     ) {
         this.facultyRepository = facultyRepository;
         this.roleRepository = roleRepository;
@@ -39,6 +41,7 @@ public class DataInitializer implements CommandLineRunner {
         this.authService = authService;
         this.userRepository = userRepository;
         this.dailyMoodRepository = dailyMoodRepository;
+        this.digitalResourcesRepository = digitalResourcesRepository;
     }
 
     @Override
@@ -143,6 +146,54 @@ public class DataInitializer implements CommandLineRunner {
                     DailyMoodEntity.builder().createdAt(LocalDateTime.now()).description("ASDASDASD").student(students.get(0)).moods(Set.of(moods.get(0), moods.get(2))).build()
                 )
             );
+        }
+
+        if (digitalResourcesRepository.findAll().isEmpty()) {
+            DigitalResourcesEntity resource1 = new DigitalResourcesEntity();
+            resource1.setTitle("Técnicas de respiración para la ansiedad");
+            resource1.setDescription("Aprende ejercicios simples de respiración que te ayudarán a manejar momentos de ansiedad.");
+            resource1.setCategory(CategoryDigitalResource.ANSIEDAD);
+            resource1.setType(TypeDigitalResource.ARTICLE);
+            resource1.setLink("https://ejemplo.com/tecnicas-respiracion");
+
+            DigitalResourcesEntity resource2 = new DigitalResourcesEntity();
+            resource2.setTitle("Mindfulness para estudiantes");
+            resource2.setDescription("Video guiado de meditación diseñado especialmente para el estrés académico.");
+            resource2.setCategory(CategoryDigitalResource.MINDFULNESS);
+            resource2.setType(TypeDigitalResource.VIDEO);
+            resource2.setLink("https://ejemplo.com/mindfulness-estudiantes");
+
+            DigitalResourcesEntity resource3 = new DigitalResourcesEntity();
+            resource3.setTitle("Guía de manejo del estrés");
+            resource3.setDescription("Estrategias prácticas para identificar y gestionar el estrés en tu vida diaria.");
+            resource3.setCategory(CategoryDigitalResource.ESTRES);
+            resource3.setType(TypeDigitalResource.BOOK);
+            resource3.setLink("https://ejemplo.com/guia-manejo-estres");
+
+            DigitalResourcesEntity resource4 = new DigitalResourcesEntity();
+            resource4.setTitle("Construyendo autoestima saludable");
+            resource4.setDescription("Ejercicios y reflexiones para fortalecer tu confianza y valoración personal.");
+            resource4.setCategory(CategoryDigitalResource.AUTOESTIMA);
+            resource4.setType(TypeDigitalResource.ARTICLE);
+            resource4.setLink("https://ejemplo.com/construyendo-autoestima");
+
+            DigitalResourcesEntity resource5 = new DigitalResourcesEntity();
+            resource5.setTitle("Hábitos de sueño saludables");
+            resource5.setDescription("Mejora tu calidad de sueño con estas recomendaciones basadas en evidencia.");
+            resource5.setCategory(CategoryDigitalResource.BIENESTAR);
+            resource5.setType(TypeDigitalResource.BOOK);
+            resource5.setLink("https://ejemplo.com/habitos-sueno");
+
+            DigitalResourcesEntity resource6 = new DigitalResourcesEntity();
+            resource6.setTitle("Manejo de emociones difíciles");
+            resource6.setDescription("Video educativo sobre cómo reconocer y procesar emociones intensas de manera saludable.");
+            resource6.setCategory(CategoryDigitalResource.EMOCIONES);
+            resource6.setType(TypeDigitalResource.VIDEO);
+            resource6.setLink("https://ejemplo.com/manejo-emociones");
+
+            digitalResourcesRepository.saveAll(List.of(
+                resource1, resource2, resource3, resource4, resource5, resource6
+            ));
         }
 
     }
