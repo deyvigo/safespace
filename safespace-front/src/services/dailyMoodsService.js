@@ -2,8 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "./apiURL";
 
 const authHeaders = (includeContentType = false) => {
-  const token =
-    "eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJuYW1lIjoiamhvbmRvZSIsInJvbGUiOiJTVFVERU5UIiwibGFzdE5hbWUiOiJEb2UiLCJuYW1lIjoiSmhvbiJ9LCJleHAiOjE3NjMxMzk3MTN9.n_j40wZAYR1r8in_Y-HzQi4Wb-6iQaYckgbKPYZBfSA"; // localStorage.getItem
+  const token = localStorage.getItem("token");
   return {
     headers: {
       Authorization: `Bearer ${token}`,

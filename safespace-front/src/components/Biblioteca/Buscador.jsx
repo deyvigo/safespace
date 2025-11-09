@@ -10,9 +10,9 @@ export default function Buscador({ onBuscar }) {
         onBuscar(texto);
       } */
       onBuscar(texto);
-    }, 300); // espera 300ms antes de disparar
+    }, 300); 
 
-    return () => clearTimeout(delay); // limpia si el usuario sigue escribiendo
+    return () => clearTimeout(delay);
   }, [query, onBuscar]);
 
   return (
