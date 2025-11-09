@@ -9,49 +9,11 @@ export default function Biblioteca() {
   const [busqueda, setBusqueda] = useState("");
   const [tagsFiltrados, setTagsFiltrados] = useState([]);
   const { digitalResources, loading, error } = useGetAllDigitalResources();
-
- /*  const recursos = [
-    {
-      titulo: "titulo1",
-      descripcion:
-        "dsdoek ovesdsd sdsd wewkefd fdkmkwmefkwm efmew fmewk ew fwmefmwem mw",
-      tags: ["t1", "t2", "t3"],
-      time: 1,
-      URL: "https://www.google.com",
-    },
-    {
-      titulo: "titulo2",
-      descripcion: "sdsfdfcxx",
-      tags: ["t1"],
-      time: 12,
-      URL: "https://www.google.com",
-    },
-    {
-      titulo: "titulo3",
-      descripcion: "fdfdfeeeeeeeee",
-      tags: ["t2", "t3"],
-      time: 3,
-      URL: "https://www.google.com",
-    },
-    {
-      titulo: "titulo3",
-      descripcion: "fdfdfeeeeeeeee",
-      tags: ["t2", "t3"],
-      time: 3,
-      URL: "https://www.google.com",
-    },
-    {
-      titulo: "titulo3",
-      descripcion: "fdfdfeeeeeeeee",
-      tags: ["t2", "t3"],
-      time: 3,
-      URL: "https://www.google.com",
-    },
-  ]; */
   const [tagsSeleccionadas, setTagsSeleccionadas] = useState([]);
   const mostrarTodo =
     tagsSeleccionadas.length === 0 || tagsSeleccionadas.length === tags.length;
-
+  const TAGS = digitalResources.map((digitalResource) => digitalResource.category);
+  console.log(TAGS);
   console.log("Tags seleccionadas:", tagsSeleccionadas);
   return (
     <div className="p-6 h-full w-full">

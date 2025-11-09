@@ -7,7 +7,7 @@ export default function Dashboard() {
   return (
     <div className="p-6 h-full w-full">
       <Welcome />
-      <div className="flex flex-row m-5 h-[60vh]">
+      <div className="flex flex-row m-5 h-min-[60vh]">
         <FormDaily />
         <EmotionChart />
       </div>

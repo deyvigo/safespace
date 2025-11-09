@@ -64,7 +64,7 @@ export default function EmotionChart() {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex-1">
+      <div className="flex flex-1 text-center items-center">
         <p className="text-gray-400">
           Tendencia positiva! Has mantenido un buen estado emocional esta
           semana.
