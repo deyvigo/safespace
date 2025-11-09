@@ -2,7 +2,6 @@ package com.example.safespace_back.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,6 +42,8 @@ public class SecurityConfiguration {
                     "/api-docs",
                     "/faculties"
                 ).permitAll()
+                // Permitir todas las solicitudes OPTIONS (preflight de CORS)
+                .requestMatchers(request -> "OPTIONS".equalsIgnoreCase(request.getMethod())).permitAll()
                 .requestMatchers(
                     "/psychologist",
                     "/sentences/**"
@@ -61,9 +62,16 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
-        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type","Accept","Origin"));
+        // Permitir todos los orígenes de localhost (cualquier puerto)
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
+        // Permitir todos los métodos HTTP necesarios
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        // Permitir todos los headers necesarios
+        configuration.setAllowedHeaders(List.of("*"));
+        // Permitir credenciales (cookies, headers de autenticación, etc.)
+        configuration.setAllowCredentials(true);
+        // Exponer headers personalizados si es necesario
+        configuration.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

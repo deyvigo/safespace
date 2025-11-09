@@ -40,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Permitir solicitudes OPTIONS (preflight de CORS) sin autenticación
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         return publicMatchers.stream().anyMatch(m -> m.matches(request));
     }
 
