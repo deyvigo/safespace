@@ -6,6 +6,7 @@ import useGetAllDigitalResources from "../hooks/DigitalResources/useGetAllDigita
 
 export default function Biblioteca() {
   const [busqueda, setBusqueda] = useState("");
+  console.log(busqueda);
   const [tagsFiltrados, setTagsFiltrados] = useState([]);
   const { digitalResources, loading, error } = useGetAllDigitalResources();
   const tags = digitalResources.map(
@@ -24,14 +25,18 @@ export default function Biblioteca() {
           Recursos validados por profesionales para tu bienestar emocional
         </p>
       </div>
-      <Buscador />
+      <Buscador onBuscar={setBusqueda} />
       <FiltradorTags tags={tags} onFiltrar={setTagsSeleccionadas} />
       <div className="grid grid-cols-3 gap-10 rounded-3xl mx-5 my-5">
         {digitalResources
-          .filter((r) =>
-            tagsSeleccionadas.length === 0
-              ? true
-              : tagsSeleccionadas.includes(r.category)
+          .filter(
+            (r) =>
+              (tagsSeleccionadas.length === 0
+                ? true
+                : tagsSeleccionadas.includes(r.category)) &&
+              (r.title.toLowerCase().includes(busqueda.toLowerCase()) ||
+                r.description.toLowerCase().includes(busqueda.toLowerCase()) ||
+                busqueda === "")
           )
           .map((digitalResource) => (
             <RecursoBox recurso={digitalResource} />

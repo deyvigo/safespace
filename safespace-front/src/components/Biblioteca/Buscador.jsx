@@ -6,9 +6,10 @@ export default function Buscador({ onBuscar }) {
   useEffect(() => {
     const delay = setTimeout(() => {
       const texto = query.trim();
-      if (texto.length >= 3) {
+      /*       if (texto.length >= 3) {
         onBuscar(texto);
-      }
+      } */
+      onBuscar(texto);
     }, 300); // espera 300ms antes de disparar
 
     return () => clearTimeout(delay); // limpia si el usuario sigue escribiendo
