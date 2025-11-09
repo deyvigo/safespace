@@ -5,16 +5,17 @@ import RecursoBox from "../components/Biblioteca/RecursoBox";
 import useGetAllDigitalResources from "../hooks/DigitalResources/useGetAllDigitalResources";
 
 export default function Biblioteca() {
-  const tags = ["tag1", "tag2", "tag3"];
   const [busqueda, setBusqueda] = useState("");
   const [tagsFiltrados, setTagsFiltrados] = useState([]);
   const { digitalResources, loading, error } = useGetAllDigitalResources();
+  const tags = digitalResources.map(
+    (digitalResource) => digitalResource.category
+  );
+  console.log(tags);
   const [tagsSeleccionadas, setTagsSeleccionadas] = useState([]);
   const mostrarTodo =
     tagsSeleccionadas.length === 0 || tagsSeleccionadas.length === tags.length;
-  const TAGS = digitalResources.map((digitalResource) => digitalResource.category);
-  console.log(TAGS);
-  console.log("Tags seleccionadas:", tagsSeleccionadas);
+  const TAGS = console.log("Tags seleccionadas:", tagsSeleccionadas);
   return (
     <div className="p-6 h-full w-full">
       <div className="text-left mx-5">
@@ -26,9 +27,15 @@ export default function Biblioteca() {
       <Buscador />
       <FiltradorTags tags={tags} onFiltrar={setTagsSeleccionadas} />
       <div className="grid grid-cols-3 gap-10 rounded-3xl mx-5 my-5">
-        {digitalResources.map((digitalResource) => (
-          <RecursoBox recurso={digitalResource} />
-        ))}
+        {digitalResources
+          .filter((r) =>
+            tagsSeleccionadas.length === 0
+              ? true
+              : tagsSeleccionadas.includes(r.category)
+          )
+          .map((digitalResource) => (
+            <RecursoBox recurso={digitalResource} />
+          ))}
       </div>
     </div>
   );
