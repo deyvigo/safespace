@@ -35,7 +35,7 @@ function AppContent() {
     } else {
       // Si no hay usuario autenticado, mostrar logo de SafeSpace #!TODO
       return (
-        <div className="bg-indigo-600 text-white fixed top-0 left-0  z-50 shadow-md  p-6 flex  w-full justify-center">
+        <div className="bg-cyan-600 text-white fixed top-0 left-0  z-50 shadow-md  p-6 flex  w-full justify-center">
           <h1 className="font-bold text-lg">SafeSpace</h1>
         </div>
       );
