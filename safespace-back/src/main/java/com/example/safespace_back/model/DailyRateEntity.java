@@ -1,10 +1,7 @@
 package com.example.safespace_back.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,14 +9,17 @@ import java.time.LocalDateTime;
 @Table(name = "daily_rate")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
-public class DailyRate {
+public class DailyRateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int rate;
+    private double rate;
+    @Column(columnDefinition = "TEXT")
+    private String justification;
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
