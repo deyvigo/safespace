@@ -32,4 +32,4 @@ logging:
     org.springframework.security: DEBUG
 
 gemini:
-  api-key: ${API_KEY}
+  api-key: ${GEMINI_API_KEY}
