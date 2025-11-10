@@ -1,6 +1,11 @@
 import "./App.css";
 
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
@@ -18,18 +23,18 @@ function AppContent() {
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
   const { user } = useContext(AuthContext);
-  
+
   // Determinar qué NavBar mostrar según el rol del usuario
   const getNavBar = () => {
     if (isLoginPage) return null;
-    
+
     if (user?.role === "PSYCHOLOGIST") {
       return <NavBarPsychologist />;
     } else if (user?.role === "STUDENT") {
       return <NavBarStudent />;
     } else {
       // Si no hay usuario autenticado, mostrar NavBar de estudiante por defecto
-      return <NavBarStudent />;
+      return;
     }
   };
 
