@@ -1,11 +1,15 @@
 import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 
-import Navbar from "./components/NavBar";
+import NavBarStudent from "./components/NavBarStudent";
+import NavBarPsychologist from "./components/NavBarPsychologist";
 import Inicio from "./pages/Inicio";
 import Login from "./pages/Login";
 import Biblioteca from "./pages/Biblioteca";
+import GestionContenidos from "./pages/GestionContenidos";
 /* import AtencionPsicologica from "./pages/AtencionPsicologica";  */
 
 import Dashboard from "./pages/Dashboard";
@@ -13,10 +17,25 @@ import Dashboard from "./pages/Dashboard";
 function AppContent() {
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
+  const { user } = useContext(AuthContext);
+  
+  // Determinar qué NavBar mostrar según el rol del usuario
+  const getNavBar = () => {
+    if (isLoginPage) return null;
+    
+    if (user?.role === "PSYCHOLOGIST") {
+      return <NavBarPsychologist />;
+    } else if (user?.role === "STUDENT") {
+      return <NavBarStudent />;
+    } else {
+      // Si no hay usuario autenticado, mostrar NavBar de estudiante por defecto
+      return <NavBarStudent />;
+    }
+  };
 
   return (
     <>
-      {!isLoginPage && <Navbar />}
+      {getNavBar()}
       {!isLoginPage && <div className="mt-20"></div>}
       <Routes>
         <Route path="/" element={<Inicio />} />
@@ -24,6 +43,7 @@ function AppContent() {
         {/* <Route path="/atencion" element={<AtencionPsicologica />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
+        <Route path="/gestion-contenidos" element={<GestionContenidos />} />
       </Routes>
     </>
   );
