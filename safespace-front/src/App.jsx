@@ -18,6 +18,7 @@ import GestionContenidos from "./pages/GestionContenidos";
 /* import AtencionPsicologica from "./pages/AtencionPsicologica";  */
 
 import Dashboard from "./pages/Dashboard";
+import DashboardPsicologo from "./pages/DashboardPsicologo";
 
 function AppContent() {
   const location = useLocation();
@@ -51,6 +52,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         {/* <Route path="/atencion" element={<AtencionPsicologica />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/psicologo/dashboard" element={<DashboardPsicologo />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
         <Route path="/gestion-contenidos" element={<GestionContenidos />} />
       </Routes>
