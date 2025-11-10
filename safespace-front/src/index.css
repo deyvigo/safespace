@@ -61,6 +61,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.clip-triangle {
+  clip-path: polygon(0 50%, 100% 100%, 0% 100%);
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
