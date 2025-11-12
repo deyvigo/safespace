@@ -25,4 +25,8 @@ public class DailyRateEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_student", nullable = false)
     StudentEntity student;
+
+    @OneToOne
+    @JoinColumn(name = "id_daily_mood")
+    DailyMoodEntity mood;
 }

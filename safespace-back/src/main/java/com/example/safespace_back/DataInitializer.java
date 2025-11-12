@@ -5,6 +5,7 @@ import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
     private final FacultyRepository facultyRepository;
     private final RoleRepository roleRepository;
@@ -23,26 +25,6 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final DailyMoodRepository dailyMoodRepository;
     private final DigitalResourcesRepository digitalResourcesRepository;
-
-    public DataInitializer(
-        FacultyRepository facultyRepository,
-        RoleRepository roleRepository,
-        MoodRepository moodRepository,
-        StudentRepository studentRepository,
-        PsychologistRepository psychologistRepository,
-        AuthService authService,
-        UserRepository userRepository,
-        DailyMoodRepository dailyMoodRepository,
-        DigitalResourcesRepository digitalResourcesRepository
-    ) {
-        this.facultyRepository = facultyRepository;
-        this.roleRepository = roleRepository;
-        this.moodRepository = moodRepository;
-        this.authService = authService;
-        this.userRepository = userRepository;
-        this.dailyMoodRepository = dailyMoodRepository;
-        this.digitalResourcesRepository = digitalResourcesRepository;
-    }
 
     @Override
     @Transactional
