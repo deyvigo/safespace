@@ -1,5 +1,6 @@
 package com.example.safespace_back.service.implement;
 
+import com.example.safespace_back.dto.internal.AIJsonResponsesHelper;
 import com.example.safespace_back.dto.internal.RateAIResponse;
 import com.example.safespace_back.model.DailyMoodEntity;
 import com.example.safespace_back.model.DailyRateEntity;
@@ -9,7 +10,6 @@ import com.example.safespace_back.service.DailyRateService;
 import com.example.safespace_back.service.GeminiAiService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,14 +55,7 @@ public class DailyRateServiceImpl implements DailyRateService {
                 mood.getMoods().forEach(m -> content.append(m.getName()).append("\n"));
                 content.append(mood.getDescription());
 
-                ImmutableMap<String, Object> schema = ImmutableMap.of(
-                    "type", "object",
-                    "properties", ImmutableMap.of(
-                           "rate", ImmutableMap.of("type", "number"),
-                           "justification", ImmutableMap.of("type", "string")
-                    ),
-                    "required", ImmutableList.of("rate", "justification")
-                );
+                ImmutableMap<String, Object> schema = AIJsonResponsesHelper.getRateSchema();
                 String response = geminiAiService.askSome("gemini-2.5-flash", schema, content.toString()).get();
 
                 ObjectMapper mapper = new ObjectMapper();
@@ -94,6 +87,13 @@ public class DailyRateServiceImpl implements DailyRateService {
         LocalDateTime end = date.toLocalDate().plusDays(1).atStartOfDay();
         List<DailyRateEntity> lastRates = dailyRateRepository.findAllByCreatedAtBetweenAndStudent_Id(start, end, student.getId());
 
-        // TODO: send notification by websocket
+        double avgRates = lastRates.stream()
+            .mapToDouble(DailyRateEntity::getRate)
+            .average()
+            .orElse(0.0);
+
+        System.out.printf("AvgRates: %f\n", avgRates);
+
+        // TODO: send notification via websocket
     }
 }

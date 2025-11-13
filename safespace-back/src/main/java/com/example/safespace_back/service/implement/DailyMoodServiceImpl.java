@@ -1,22 +1,15 @@
 package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
-import com.example.safespace_back.dto.internal.RateAIResponse;
 import com.example.safespace_back.dto.out.DailyMoodCompletedDTO;
 import com.example.safespace_back.dto.out.DailyMoodDTO;
 import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.mapper.DailyMoodMapper;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.DailyMoodRepository;
-import com.example.safespace_back.repository.DailyRateRepository;
 import com.example.safespace_back.repository.MoodRepository;
 import com.example.safespace_back.service.DailyMoodService;
 import com.example.safespace_back.service.DailyRateService;
-import com.example.safespace_back.service.GeminiAiService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -25,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Service
