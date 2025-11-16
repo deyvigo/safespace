@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/dailymoods")
@@ -28,6 +28,6 @@ public class DailyMoodController {
 
     @PostMapping("")
     public ResponseEntity<DailyMoodDTO> registerDailyMood(@Valid @RequestBody DailyMoodRequestDTO dto, @AuthenticationPrincipal UserEntity user) {
-        return ResponseEntity.ok(dailyMoodService.registerDailyMoodToday(dto, user));
+        return ResponseEntity.ok(dailyMoodService.registerDailyMoodToday(dto, LocalDateTime.now(), user));
     }
 }

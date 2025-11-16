@@ -5,35 +5,31 @@ import com.example.safespace_back.dto.out.DailyMoodCompletedDTO;
 import com.example.safespace_back.dto.out.DailyMoodDTO;
 import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.mapper.DailyMoodMapper;
-import com.example.safespace_back.model.DailyMoodEntity;
-import com.example.safespace_back.model.MoodEntity;
-import com.example.safespace_back.model.StudentEntity;
-import com.example.safespace_back.model.UserEntity;
+import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.DailyMoodRepository;
 import com.example.safespace_back.repository.MoodRepository;
 import com.example.safespace_back.service.DailyMoodService;
+import com.example.safespace_back.service.DailyRateService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 @Service
+@RequiredArgsConstructor
 public class DailyMoodServiceImpl implements DailyMoodService {
     private final DailyMoodRepository dailyMoodRepository;
     private final MoodRepository moodRepository;
     private final DailyMoodMapper dailyMoodMapper;
+    private final DailyRateService dailyRateService;
 
-    public DailyMoodServiceImpl(
-        DailyMoodRepository dailyMoodRepository,
-        MoodRepository moodRepository,
-        DailyMoodMapper dailyMoodMapper
-    ) {
-        this.dailyMoodRepository = dailyMoodRepository;
-        this.moodRepository = moodRepository;
-        this.dailyMoodMapper = dailyMoodMapper;
-    }
+    @Qualifier("asyncExecutor")
+    private final Executor myExecutor;
 
     @Override
     public DailyMoodCompletedDTO checkIfAlreadyRegisteredDailyMoodToday(Long id) {
@@ -45,7 +41,7 @@ public class DailyMoodServiceImpl implements DailyMoodService {
     }
 
     @Override
-    public DailyMoodDTO registerDailyMoodToday(DailyMoodRequestDTO dto, UserEntity user) {
+    public DailyMoodDTO registerDailyMoodToday(DailyMoodRequestDTO dto, LocalDateTime date, UserEntity user) {
         List<MoodEntity> moodEntities = moodRepository.findAllById(dto.moods());
 
         if (moodEntities.isEmpty()) {
@@ -56,10 +52,13 @@ public class DailyMoodServiceImpl implements DailyMoodService {
             .moods(new HashSet<>(moodEntities))
             .student((StudentEntity) user)
             .description(dto.description())
-            .createdAt(LocalDateTime.now())
+            .createdAt(date)
             .build();
-        return dailyMoodMapper.toDTO(dailyMoodRepository.save(dailyMoodEntity));
 
-        // TODO: rate daily status and save on daily rate
+        DailyMoodEntity saved = dailyMoodRepository.save(dailyMoodEntity);
+
+        dailyRateService.save(saved, date);
+
+        return dailyMoodMapper.toDTO(saved);
     }
 }
