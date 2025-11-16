@@ -4,8 +4,10 @@ import com.example.safespace_back.model.DailyMoodEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface DailyMoodRepository extends JpaRepository<DailyMoodEntity, Long> {
     Optional<DailyMoodEntity> findByCreatedAtBetweenAndStudent_Id(LocalDateTime start, LocalDateTime end, Long id);
+    List<DailyMoodEntity> findAllByCreatedAtBetweenAndStudent_Id(LocalDateTime start, LocalDateTime end, Long id);
 }
