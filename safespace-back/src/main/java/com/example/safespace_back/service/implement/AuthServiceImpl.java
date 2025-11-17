@@ -15,9 +15,11 @@ import com.example.safespace_back.mapper.StudentMapper;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -68,6 +70,10 @@ public class AuthServiceImpl implements AuthService {
         RoleEntity role = roleRepository.findByRole(Role.STUDENT)
             .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         student.setRole(role);
+
+        // add the psychologist with less students subscribed
+        List<Long> counts = psychologistRepository.findStudentCountOrderedAsc(PageRequest.of(0, 1));
+        student.setPsychologist(psychologistRepository.findAllByStudentCount(counts.getFirst()).getFirst());
 
         return studentMapper.toResponse(studentRepository.save(student));
     }
