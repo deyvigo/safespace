@@ -2,6 +2,7 @@ package com.example.safespace_back.service;
 
 import com.example.safespace_back.model.DailyMoodEntity;
 import com.example.safespace_back.model.DailyRateEntity;
+import com.example.safespace_back.model.PsychologistEntity;
 import com.example.safespace_back.model.StudentEntity;
 
 import java.time.LocalDateTime;
