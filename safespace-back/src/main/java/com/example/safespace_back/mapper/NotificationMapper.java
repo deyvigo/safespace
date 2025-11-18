@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.List;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface NotificationMapper {
     @Mapping(target = "studentName", source = "student.name")
@@ -13,4 +15,6 @@ public interface NotificationMapper {
     @Mapping(target = "studentUsername", source = "student.username")
     @Mapping(target = "message", source = "content")
     NotificationResponseDTO fromEntitytoDTO(NotificationEntity notificationEntity);
+
+    List<NotificationResponseDTO> fromEntityListToDTOList(List<NotificationEntity> entities);
 }
