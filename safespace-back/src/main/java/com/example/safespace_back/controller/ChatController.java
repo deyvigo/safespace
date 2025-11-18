@@ -1,0 +1,81 @@
+package com.example.safespace_back.controller;
+
+import com.example.safespace_back.dto.in.MessageRequestDTO;
+import com.example.safespace_back.dto.out.MessageResponseDTO;
+import com.example.safespace_back.mapper.ChatMessageMapper;
+import com.example.safespace_back.model.*;
+import com.example.safespace_back.repository.ChatMessageRepository;
+import com.example.safespace_back.repository.ChatRepository;
+import com.example.safespace_back.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.time.LocalDateTime;
+
+@RestController
+@RequestMapping("")
+@RequiredArgsConstructor
+public class ChatController {
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatMessageMapper chatMessageMapper;
+
+    @Transactional
+    @MessageMapping("/chat.send")
+    public void sendMessage(MessageRequestDTO message, Principal principal) {
+        String senderUsername = principal.getName();
+        UserEntity senderUser = userRepository.findByUsername(senderUsername).orElse(null);
+        UserEntity receiverUser = userRepository.findByUsername(message.receiver()).orElse(null);
+
+        if (senderUser == null || receiverUser == null) {
+            return;
+        }
+
+        StudentEntity student;
+        PsychologistEntity psychologist;
+
+        if (senderUser instanceof StudentEntity) {
+            student = (StudentEntity) senderUser;
+            psychologist = (PsychologistEntity) receiverUser;
+        } else {
+            student = (StudentEntity) receiverUser;
+            psychologist = (PsychologistEntity) senderUser;
+        }
+
+        ChatEntity chat = chatRepository
+            .findByStudent_IdAndPsychologist_Id(student.getId(), psychologist.getId())
+            .orElseGet(() -> chatRepository.save(
+                ChatEntity
+                    .builder()
+                    .createdAt(LocalDateTime.now())
+                    .student(student)
+                    .psychologist(psychologist)
+                    .build()
+            ));
+
+        ChatMessageEntity chatMessage = ChatMessageEntity
+            .builder()
+            .chat(chat)
+            .sender(senderUser)
+            .createdAt(LocalDateTime.now())
+            .content(message.content())
+            .build();
+
+        ChatMessageEntity saved =  chatMessageRepository.save(chatMessage);
+
+        MessageResponseDTO messageDTO = chatMessageMapper.fromChatMessageEntityToDTO(saved);
+
+        simpMessagingTemplate.convertAndSendToUser(
+            receiverUser.getUsername(),
+            "/queue/messages",
+            messageDTO
+        );
+    }
+}

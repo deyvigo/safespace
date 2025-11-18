@@ -1,10 +1,7 @@
 package com.example.safespace_back.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ChatMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +23,8 @@ public class ChatMessageEntity {
     @JoinColumn(name = "id_chat", nullable = false)
     private ChatEntity chat;
 
+    // id sender from chat entity ids
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sender", nullable = false)
-    private UserEntity user;
+    private UserEntity sender;
 }

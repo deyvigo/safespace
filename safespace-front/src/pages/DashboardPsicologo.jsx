@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { AlertItem } from "../components/Psicologo/Dashboard/AlertItem";
+import { AlertBox } from "../components/Psicologo/Dashboard/AlertBox";
 
 export default function DashboardPsicologo() {
   const { user } = useContext(AuthContext);
@@ -167,46 +169,7 @@ export default function DashboardPsicologo() {
               </Link>
             </div>
 
-            <div className="space-y-4">
-              {/* Alerta 1 */}
-              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">María García</p>
-                  <p className="text-sm text-gray-600">
-                    5 días seguidos - Triste
-                  </p>
-                </div>
-                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Urgente
-                </span>
-              </div>
-
-              {/* Alerta 2 */}
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">Carlos López</p>
-                  <p className="text-sm text-gray-600">
-                    3 días seguidos - Ansioso
-                  </p>
-                </div>
-                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Moderado
-                </span>
-              </div>
-
-              {/* Alerta 3 */}
-              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">Ana Torres</p>
-                  <p className="text-sm text-gray-600">
-                    4 días seguidos - Estresado
-                  </p>
-                </div>
-                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Urgente
-                </span>
-              </div>
-            </div>
+            <AlertBox />
           </div>
 
           {/* Próximas Sesiones */}

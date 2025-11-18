@@ -1,19 +1,22 @@
 package com.example.safespace_back.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat")
+@Table(
+    name = "chat",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "id_student", "id-psychologist" })
+    }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ChatEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
