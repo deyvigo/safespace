@@ -40,7 +40,8 @@ public class SecurityConfiguration {
                     "/swagger-ui.html",
                     "/swagger-ui/**",
                     "/api-docs",
-                    "/faculties"
+                    "/faculties",
+                    "/ws/**"
                 ).permitAll()
                 // Permitir todas las solicitudes OPTIONS (preflight de CORS)
                 .requestMatchers(request -> "OPTIONS".equalsIgnoreCase(request.getMethod())).permitAll()

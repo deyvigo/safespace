@@ -29,7 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/swagger-ui.html",
         "/swagger-ui/**",
         "/api-docs",
-        "/faculties"
+        "/faculties",
+        "/ws/**"
     ).map(path -> PathPatternRequestMatcher.withDefaults().matcher(path)).toList();
 
 
