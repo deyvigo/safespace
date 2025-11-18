@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "./apiURL";
 
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return {
     headers: {
