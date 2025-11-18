@@ -9,6 +9,7 @@ import com.example.safespace_back.repository.DailyRateRepository;
 import com.example.safespace_back.repository.NotificationRepository;
 import com.example.safespace_back.service.DailyRateService;
 import com.example.safespace_back.service.GeminiAiService;
+import com.example.safespace_back.service.WebSocketService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -31,6 +32,7 @@ public class DailyRateServiceImpl implements DailyRateService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final WebSocketService webSocketService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -113,10 +115,6 @@ public class DailyRateServiceImpl implements DailyRateService {
 
         NotificationResponseDTO notificationResponseDTO = notificationMapper.fromEntitytoDTO(saved);
 
-        simpMessagingTemplate.convertAndSendToUser(
-            student.getPsychologist().getUsername(),
-            "/queue/notifications",
-            notificationResponseDTO
-        );
+        webSocketService.sendNotification(notificationResponseDTO, student.getPsychologist());
     }
 }
