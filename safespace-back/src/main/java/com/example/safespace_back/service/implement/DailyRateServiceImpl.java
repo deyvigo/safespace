@@ -11,8 +11,8 @@ import com.example.safespace_back.service.GeminiAiService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,13 +21,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Service
-@RequiredArgsConstructor
 public class DailyRateServiceImpl implements DailyRateService {
     private final DailyRateRepository dailyRateRepository;
     private final GeminiAiService geminiAiService;
 
     @Qualifier("asyncExecutor")
     private final Executor myExecutor;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    public DailyRateServiceImpl(
+        DailyRateRepository dailyRateRepository,
+        GeminiAiService geminiAiService,
+        @Qualifier("asyncExecutor") Executor myExecutor,
+        SimpMessagingTemplate simpMessagingTemplate) {
+        this.dailyRateRepository = dailyRateRepository;
+        this.geminiAiService = geminiAiService;
+        this.myExecutor = myExecutor;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
 
     @Override
     public void save(DailyMoodEntity mood, LocalDateTime date) {
@@ -92,8 +103,21 @@ public class DailyRateServiceImpl implements DailyRateService {
             .average()
             .orElse(0.0);
 
-        System.out.printf("AvgRates: %f\n", avgRates);
+        String message;
+
+        if (avgRates >= 7 && avgRates <= 10) {
+            message = student.getName() + " lleva un promedio de 7 en los últimos días.";
+        } else if (avgRates >= 4) {
+            message = student.getName() + " lleva un promedio de 4 en los últimos días.";
+        } else {
+            message = student.getName() + " lleva un promedio de menos de 4 en los últimos días";
+        }
 
         // TODO: send notification via websocket
+        simpMessagingTemplate.convertAndSendToUser(
+            student.getPsychologist().getUsername(),
+            "/queue/notifications",
+            message
+        );
     }
 }

@@ -11,7 +11,6 @@ import com.example.safespace_back.repository.MoodRepository;
 import com.example.safespace_back.service.DailyMoodService;
 import com.example.safespace_back.service.DailyRateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,9 +26,6 @@ public class DailyMoodServiceImpl implements DailyMoodService {
     private final MoodRepository moodRepository;
     private final DailyMoodMapper dailyMoodMapper;
     private final DailyRateService dailyRateService;
-
-    @Qualifier("asyncExecutor")
-    private final Executor myExecutor;
 
     @Override
     public DailyMoodCompletedDTO checkIfAlreadyRegisteredDailyMoodToday(Long id) {

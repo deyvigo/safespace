@@ -15,14 +15,17 @@ import com.example.safespace_back.mapper.StudentMapper;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final FacultyRepository facultyRepository;
@@ -33,28 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final StudentMapper studentMapper;
     private final PsychologistMapper psychologistMapper;
     private final JwtService jwtService;
-
-    public AuthServiceImpl (
-        UserRepository userRepository,
-        FacultyRepository facultyRepository,
-        RoleRepository roleRepository,
-        StudentRepository studentRepository,
-        PsychologistRepository psychologistRepository,
-        BCryptPasswordEncoder bCryptPasswordEncoder,
-        StudentMapper studentMapper,
-        PsychologistMapper psychologistMapper,
-        JwtService jwtService
-    ) {
-        this.userRepository = userRepository;
-        this.facultyRepository = facultyRepository;
-        this.roleRepository = roleRepository;
-        this.studentRepository = studentRepository;
-        this.psychologistRepository = psychologistRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.studentMapper = studentMapper;
-        this.psychologistMapper = psychologistMapper;
-        this.jwtService = jwtService;
-    }
+    private final ChatRepository chatRepository;
 
     @Override
     public RegisterStudentResponseDTO registerStudent(RegisterStudentRequestDTO dto) {
@@ -71,11 +53,24 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         student.setRole(role);
 
-        // add the psychologist with less students subscribed
+        // add the psychologist with fewer students subscribed
         List<Long> counts = psychologistRepository.findStudentCountOrderedAsc(PageRequest.of(0, 1));
-        student.setPsychologist(psychologistRepository.findAllByStudentCount(counts.getFirst()).getFirst());
+        PsychologistEntity psychologist = psychologistRepository.findAllByStudentCount(counts.getFirst()).getFirst();
+        student.setPsychologist(psychologist);
 
-        return studentMapper.toResponse(studentRepository.save(student));
+        StudentEntity saved =  studentRepository.save(student);
+
+        // create chat entity
+        chatRepository.save(
+            ChatEntity
+                .builder()
+                .createdAt(LocalDateTime.now())
+                .student(saved)
+                .psychologist(psychologist)
+                .build()
+        );
+
+        return studentMapper.toResponse(saved);
     }
 
     @Override
