@@ -2,11 +2,9 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.out.ConversationResponseDTO;
 import com.example.safespace_back.dto.out.MessageResponseDTO;
+import com.example.safespace_back.dto.out.PsychologistDTO;
 import com.example.safespace_back.mapper.ChatMessageMapper;
-import com.example.safespace_back.model.ChatEntity;
-import com.example.safespace_back.model.ChatMessageEntity;
-import com.example.safespace_back.model.StudentEntity;
-import com.example.safespace_back.model.UserEntity;
+import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.ChatMessageRepository;
 import com.example.safespace_back.repository.ChatRepository;
 import com.example.safespace_back.service.ChatService;
@@ -16,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -66,5 +66,28 @@ public class ChatServiceImpl implements ChatService {
         Page<ChatMessageEntity> page = chatMessageRepository.findAllByChat_Id(conversationId, pageable);
 
         return page.map(chatMessageMapper::fromChatMessageEntityToDTO);
+    }
+
+    @Override
+    public void markLastMessagesLikeSeen(Long conversationId, UserEntity user) {
+        System.out.println("Holaaa");
+        ChatEntity chat = chatRepository.findById(conversationId).orElse(null);
+
+        if (chat == null) return;
+
+        Long userId = user.getId();
+        Long studentId = chat.getStudent() != null ? chat.getStudent().getId() : null;
+        Long psychologistId =  chat.getPsychologist() != null ? chat.getPsychologist().getId() : null;
+
+        if (!Objects.equals(userId, studentId) && !Objects.equals(userId, psychologistId)) {
+            return;
+        }
+
+        List<ChatMessageEntity> toMark = chatMessageRepository.findAllByChat_IdAndSeenAndSender_IdNot(conversationId, false, userId);
+
+        if (toMark.isEmpty()) return;
+
+        toMark.forEach(c -> c.setSeen(true));
+        chatMessageRepository.saveAll(toMark);
     }
 }

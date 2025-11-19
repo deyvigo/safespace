@@ -22,7 +22,6 @@ export const Chat = () => {
     // callback que usa refs y actualizadores funcionales
     const onMessageReceived = (data) => {
       console.log("mensaje recibido", data)
-      console.log("conversacion seleccionada", selectedConversationRef.current)
 
       // Añadir mensaje sólo si pertenece a la conversación seleccionada
       if (data.chat_id === selectedConversationRef.current.id) {

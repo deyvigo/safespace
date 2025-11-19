@@ -2,7 +2,7 @@ import dayjs from "dayjs"
 import "dayjs/locale/es"
 dayjs.locale("es")
 
-export const ConversationItem = ({ name, last_message, date, onClick, active }) => {
+export const ConversationItem = ({ name, last_message, date, onClick, active, seen }) => {
   const formatDate = (date) => {
     if (!date) return ''
     
@@ -30,7 +30,7 @@ export const ConversationItem = ({ name, last_message, date, onClick, active }) 
           <h1 className="font-semibold text-lg! leading-tight truncate w-auto">{ name }</h1>
           <p className="text-xs! flex-1 text-right flex justify-end items-center">{ formatDate(date) }</p>
         </div>
-        <p className="text-xs text-gray-700 truncate">
+        <p className={`${seen ? "" : "font-extrabold"} text-xs text-gray-700 truncate`}>
           { last_message }
         </p>
       </div>

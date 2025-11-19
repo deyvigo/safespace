@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record MessageResponseDTO (
     Long Id,
     String content,
+    boolean seen,
     LocalDateTime createdAt,
     String senderUsername,
     Long chatId

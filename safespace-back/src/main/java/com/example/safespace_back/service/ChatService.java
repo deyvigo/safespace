@@ -11,5 +11,5 @@ import java.util.List;
 public interface ChatService {
     List<ConversationResponseDTO> getAllConversations(UserEntity user);
     Page<MessageResponseDTO> getMessagesResponse(Pageable pageable, UserEntity user, Long conversationId);
-
+    void markLastMessagesLikeSeen(Long conversationId, UserEntity user);
 }

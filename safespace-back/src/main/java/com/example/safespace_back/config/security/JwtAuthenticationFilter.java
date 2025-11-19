@@ -45,6 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
+
+        if("PATCH".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         return publicMatchers.stream().anyMatch(m -> m.matches(request));
     }
 

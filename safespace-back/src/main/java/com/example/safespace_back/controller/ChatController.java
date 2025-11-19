@@ -17,10 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -104,5 +101,11 @@ public class ChatController {
     @GetMapping("/conversation/{idConversation}/messages")
     public ResponseEntity<Page<MessageResponseDTO>> getAllMessages(@PathVariable Long idConversation, Pageable pageable, @AuthenticationPrincipal UserEntity user) {
         return ResponseEntity.ok(chatService.getMessagesResponse(pageable, user, idConversation));
+    }
+
+    @PatchMapping("/conversation/{idConversation}")
+    public ResponseEntity<Void> markConversationAsRead(@PathVariable Long idConversation, @AuthenticationPrincipal UserEntity user) {
+        chatService.markLastMessagesLikeSeen(idConversation, user);
+        return ResponseEntity.noContent().build();
     }
 }
