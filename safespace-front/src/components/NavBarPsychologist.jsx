@@ -72,6 +72,7 @@ export default function NavBarStudent() {
           >
             Pacientes
           </Link>
+          
           {token ? (
             <button
               onClick={handleLogout}
@@ -120,6 +121,12 @@ export default function NavBarStudent() {
           className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
         >
           Gestión de Contenidos
+        </Link>
+        <Link
+          to="/sesiones"
+          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
+        >
+          Sesiones
         </Link>
         <Link
           to="/pacientes"

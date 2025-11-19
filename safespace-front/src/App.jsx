@@ -19,6 +19,7 @@ import GestionContenidos from "./pages/GestionContenidos";
 
 import Dashboard from "./pages/Dashboard";
 import DashboardPsicologo from "./pages/DashboardPsicologo";
+import Sesiones from "./pages/Sesiones";
 
 function AppContent() {
   const location = useLocation();
@@ -55,6 +56,7 @@ function AppContent() {
         <Route path="/psicologo/dashboard" element={<DashboardPsicologo />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
         <Route path="/gestion-contenidos" element={<GestionContenidos />} />
+        <Route path="/sesiones" element={<Sesiones />} />
       </Routes>
     </>
   );
