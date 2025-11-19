@@ -8,15 +8,19 @@ export default function SesionPendiente({ sesion }) {
     sesion.fecha ? new Date(sesion.fecha) : null
   );
   const [nuevoTipo, setNuevoTipo] = useState(sesion.tipo || "");
+  const [linkSesion, setLinkSesion] = useState("");
 
   const confirmarReprogramacion = () => {
     if (nuevaFecha && nuevoTipo) {
-      // Aquí podrías enviar la nueva fecha y tipo al backend o actualizar el estado global
       console.log("Reprogramado para:", nuevaFecha);
       console.log("Tipo de sesión:", nuevoTipo);
+      if (nuevoTipo === "virtual") {
+        console.log("Link de sesión:", linkSesion);
+      }
       setModoReprogramar(false);
       setNuevaFecha(null);
       setNuevoTipo("");
+      setLinkSesion("");
     }
   };
 
@@ -24,6 +28,7 @@ export default function SesionPendiente({ sesion }) {
     setModoReprogramar(false);
     setNuevaFecha(null);
     setNuevoTipo("");
+    setLinkSesion("");
   };
 
   return (
@@ -32,8 +37,19 @@ export default function SesionPendiente({ sesion }) {
         <div className="flex flex-col">
           <h1>Nombre</h1>
           {/* sesion.paciente */}
-          <p className="text-gray-500">Hora hh:mm</p>
+          <p className="text-gray-500">Fecha - Hora hh:mm</p>
           {/* sesion.hora */}
+        </div>
+        <div className="bg-blue-500 rounded-xl">
+          {sesion?.type === "Presencial" ? (
+            <button type="button" className="text-white">
+              Presencial
+            </button>
+          ) : (
+            <button type="button" className="text-white">
+              Virtual
+            </button>
+          )}
         </div>
       </div>
 
@@ -70,13 +86,28 @@ export default function SesionPendiente({ sesion }) {
               </select>
             </div>
 
+            {nuevoTipo === "virtual" && (
+              <div className="flex flex-col gap-2">
+                <label className="text-sm text-gray-700 font-semibold">
+                  Link de la sesión:
+                </label>
+                <input
+                  type="text"
+                  value={linkSesion}
+                  onChange={(e) => setLinkSesion(e.target.value)}
+                  placeholder="https://..."
+                  className="border border-gray-400 rounded-xl p-2 w-full"
+                />
+              </div>
+            )}
+
             <div className="flex flex-row justify-between mt-4">
               <button
                 type="button"
                 onClick={confirmarReprogramacion}
-                disabled={!nuevaFecha || !nuevoTipo}
+                disabled={!nuevaFecha || !nuevoTipo || !linkSesion}
                 className={`px-4 py-2 rounded-xl text-white ${
-                  nuevaFecha && nuevoTipo
+                  nuevaFecha && nuevoTipo && linkSesion
                     ? "bg-blue-600"
                     : "bg-blue-300 cursor-not-allowed"
                 }`}
@@ -101,6 +132,7 @@ export default function SesionPendiente({ sesion }) {
               onClick={() => {
                 setNuevaFecha(sesion.fecha ? new Date(sesion.fecha) : null);
                 setNuevoTipo(sesion.tipo || "");
+                setLinkSesion(sesion.link || "");
                 setModoReprogramar(true);
               }}
               className="w-4xl self-center border-2 bg-green-500 text-white px-4 py-2 rounded-xl"
