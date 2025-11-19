@@ -8,14 +8,20 @@ export default function SesionBox({ sesion }) {
           <p className="text-gray-500">Hora hh:mm</p>
           {/* sesion.hora */}
         </div>
+        {console.log(sesion?.type)}
         <div className="bg-blue-500 rounded-xl">
-          <a href="https://google.com">
-            {/* sesion.link */}
+          {sesion?.type === "Presencial" ? (
             <button type="button" className="text-white">
-              Unirse ahora
+              Presencial
             </button>
-          </a>{" "}
-          {/* sesion.link */}
+          ) : (
+            <a href="https://google.com">
+              {/* sesion.link */}
+              <button type="button" className="text-white">
+                Unirse ahora
+              </button>
+            </a>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-4 font-semibold">

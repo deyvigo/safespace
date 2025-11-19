@@ -48,14 +48,14 @@ export default function Sesiones() {
           <SesionHistorialBox sesion={sesion} />
         </div>
       )}
-      filtroActivo == "Pendientes" && (
-      <div className="flex flex-col gap-10">
-        <SesionPendiente sesion={sesion} />
-        <SesionPendiente sesion={sesion} />
-        <SesionPendiente sesion={sesion} />
-        <SesionPendiente sesion={sesion} />
-      </div>
-      )
+      {filtroActivo == "Pendientes" && (
+        <div className="flex flex-col gap-10">
+          <SesionPendiente sesion={sesion} />
+          <SesionPendiente sesion={sesion} />
+          <SesionPendiente sesion={sesion} />
+          <SesionPendiente sesion={sesion} />
+        </div>
+      )}
     </div>
   );
 }
