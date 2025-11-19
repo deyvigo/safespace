@@ -1,6 +1,6 @@
 export default function SesionBox({ sesion }) {
   return (
-    <div className="flex flex-col text-black p-5 border-gray-400 border-2 rounded-2xl gap-5">
+    <div className="flex flex-col text-black p-5 border-gray-400 bg-white border-2 rounded-2xl gap-5">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-col">
           <h1>Nombre</h1>
@@ -42,12 +42,12 @@ export default function SesionBox({ sesion }) {
         >
           Guardar notas
         </button>
-        <button
+        {/*         <button
           type="button"
           className="w-4xl self-center border-2 bg-green-500 text-white"
         >
           Marcar como completado
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -7,18 +7,27 @@ export default function SesionPendiente({ sesion }) {
   const [nuevaFecha, setNuevaFecha] = useState(
     sesion.fecha ? new Date(sesion.fecha) : null
   );
+  const [nuevaHora, setNuevaHora] = useState(
+    sesion.fecha ? new Date(sesion.fecha) : null
+  );
   const [nuevoTipo, setNuevoTipo] = useState(sesion.tipo || "");
   const [linkSesion, setLinkSesion] = useState("");
 
   const confirmarReprogramacion = () => {
-    if (nuevaFecha && nuevoTipo) {
-      console.log("Reprogramado para:", nuevaFecha);
+    if (nuevaFecha && nuevaHora && nuevoTipo) {
+      const fechaFinal = new Date(nuevaFecha);
+      fechaFinal.setHours(nuevaHora.getHours());
+      fechaFinal.setMinutes(nuevaHora.getMinutes());
+
+      console.log("Reprogramado para:", fechaFinal);
       console.log("Tipo de sesión:", nuevoTipo);
       if (nuevoTipo === "virtual") {
         console.log("Link de sesión:", linkSesion);
       }
+
       setModoReprogramar(false);
       setNuevaFecha(null);
+      setNuevaHora(null);
       setNuevoTipo("");
       setLinkSesion("");
     }
@@ -27,6 +36,7 @@ export default function SesionPendiente({ sesion }) {
   const cancelarReprogramacion = () => {
     setModoReprogramar(false);
     setNuevaFecha(null);
+    setNuevaHora(null);
     setNuevoTipo("");
     setLinkSesion("");
   };
@@ -58,17 +68,29 @@ export default function SesionPendiente({ sesion }) {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-700 font-semibold">
-                Nueva fecha:
+                Nueva fecha y hora:
               </label>
-              <DatePicker
-                selected={nuevaFecha}
-                onChange={(date) => setNuevaFecha(date)}
-                minDate={new Date()}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="Selecciona nueva fecha"
-                className="border border-gray-400 rounded-xl p-2 w-full"
-                popperPlacement="bottom-start"
-              />
+              <div className="flex gap-4">
+                <DatePicker
+                  selected={nuevaFecha}
+                  onChange={(date) => setNuevaFecha(date)}
+                  minDate={new Date()}
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Fecha"
+                  className="border border-gray-400 rounded-xl p-2 w-full"
+                />
+                <DatePicker
+                  selected={nuevaHora}
+                  onChange={(time) => setNuevaHora(time)}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Hora"
+                  dateFormat="HH:mm"
+                  placeholderText="Hora"
+                  className="border border-gray-400 rounded-xl p-2 w-full"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -105,9 +127,17 @@ export default function SesionPendiente({ sesion }) {
               <button
                 type="button"
                 onClick={confirmarReprogramacion}
-                disabled={!nuevaFecha || !nuevoTipo || !linkSesion}
+                disabled={
+                  !nuevaFecha ||
+                  !nuevaHora ||
+                  !nuevoTipo ||
+                  (nuevoTipo === "virtual" && !linkSesion)
+                }
                 className={`px-4 py-2 rounded-xl text-white ${
-                  nuevaFecha && nuevoTipo && linkSesion
+                  nuevaFecha &&
+                  nuevaHora &&
+                  nuevoTipo &&
+                  (nuevoTipo !== "virtual" || linkSesion)
                     ? "bg-blue-600"
                     : "bg-blue-300 cursor-not-allowed"
                 }`}
@@ -130,7 +160,11 @@ export default function SesionPendiente({ sesion }) {
             <button
               type="button"
               onClick={() => {
-                setNuevaFecha(sesion.fecha ? new Date(sesion.fecha) : null);
+                const fechaOriginal = sesion.fecha
+                  ? new Date(sesion.fecha)
+                  : null;
+                setNuevaFecha(fechaOriginal);
+                setNuevaHora(fechaOriginal);
                 setNuevoTipo(sesion.tipo || "");
                 setLinkSesion(sesion.link || "");
                 setModoReprogramar(true);

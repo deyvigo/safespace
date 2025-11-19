@@ -8,6 +8,17 @@ export default function SesionHistorialBox({ sesion }) {
           <p className="text-gray-500">Fecha - Hora hh:mm</p>
           {/* sesion.hora */}
         </div>
+        <div className="bg-blue-500 rounded-xl">
+          {sesion?.type === "Presencial" ? (
+            <button type="button" className="text-white">
+              Presencial
+            </button>
+          ) : (
+            <button type="button" className="text-white">
+              Virtual
+            </button>
+          )}
+        </div>
       </div>
       <div className="border-gray-500 rounded-3xl">
         <p className="font-semibold mb-2">Notas de sesion</p>
