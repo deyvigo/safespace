@@ -37,7 +37,7 @@ export const connectStomp = (username, token, service, onMessage) => {
   return stompClient
 }
 
-export const sendMessage = (receiver, content) => {
+export const sendMessage = (receiver, content, conversation_id) => {
   if (!stompClient || !stompClient.connected) {
     console.error('❌ STOMP no conectado')
     return
@@ -45,6 +45,6 @@ export const sendMessage = (receiver, content) => {
 
   stompClient.publish({
     destination: '/app/chat.send',
-    body: JSON.stringify({ receiver, content }),
+    body: JSON.stringify({ receiver, content, conversation_id }),
   })
 }

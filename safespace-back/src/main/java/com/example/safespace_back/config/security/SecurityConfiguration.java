@@ -55,6 +55,9 @@ public class SecurityConfiguration {
                     "/dailymoods/**",
                     "/students/**"
                 ).hasAuthority("STUDENT")
+                .requestMatchers(
+                    "/chat/conversation/**"
+                ).hasAnyAuthority("STUDENT", "PSYCHOLOGIST")
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

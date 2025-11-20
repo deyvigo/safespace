@@ -16,8 +16,10 @@ public class ChatMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "TEXT")
     private String content;
     private LocalDateTime createdAt;
+    boolean seen = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_chat", nullable = false)

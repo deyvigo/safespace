@@ -83,6 +83,14 @@ export default function NavBarPsychologist() {
         >
           Contenidos
         </Link>
+        <Link
+          to="/chat"
+          className={`text-white hover:text-blue-200 transition-colors ${
+            location.pathname === "/chat" ? "font-semibold underline" : ""
+          }`}
+        >
+          Chat
+        </Link>
         {token ? (
           <button
             onClick={handleLogout}
