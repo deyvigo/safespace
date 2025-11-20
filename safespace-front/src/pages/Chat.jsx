@@ -4,6 +4,7 @@ import { ConversationBox } from "../components/Chat/ConversationBox"
 import { AuthContext } from "../context/AuthContext"
 import { connectStomp } from "../services/webSocket"
 import { getConversations, getMessagesByConversation, markConversationAsRead } from "../services/chatService"
+import { ChatLayoutProtector } from "../components/Chat/ChatLayoutProtector"
 
 export const Chat = () => {
   const { token, user } = useContext(AuthContext)
@@ -26,7 +27,6 @@ export const Chat = () => {
       const isOpen = currentChatId === inComingChatId
       // Añadir mensaje sólo si pertenece a la conversación seleccionadas
       if (isOpen) {
-        console.log(`markConversationAsRead(${currentChatId}): actual_user=${JSON.stringify(user)}`)
         markConversationAsRead(selectedConversationRef.current.id)
         // Optimistic update
         data.seen = true
@@ -100,13 +100,17 @@ export const Chat = () => {
           conversations={conversations}
           updateConversations={setConversations}
         />
-        <ChatLayout
-          messages={messages}
-          username={selectedConversation.username}
-          conversation_id={selectedConversation.id}
-          name={selectedConversation.name}
-          updateMessages={setMessages}
-        />
+        {
+          selectedConversation.id === null ?
+          <ChatLayoutProtector /> :
+          <ChatLayout
+            messages={messages}
+            username={selectedConversation.username}
+            conversation_id={selectedConversation.id}
+            name={selectedConversation.name}
+            updateMessages={setMessages}
+          />
+        }
       </main>
     </div>
   )

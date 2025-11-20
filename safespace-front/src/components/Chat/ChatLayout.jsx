@@ -1,15 +1,20 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { sendMessage } from "../../services/webSocket"
 import { SendIcon } from "../Icons/SendIcon"
 import { MessagesBox } from "./MessagesBox"
 
 export const ChatLayout = ({ name, conversation_id, username, messages, updateMessages }) => {
   const [message, setMessage] = useState("")
+  const messagesBoxRef = useRef(null)
 
-  const handleSendMessage = (message) => {
-    if (!message) return
-    sendMessage(username, message, conversation_id)
+  const handleSendMessage = (msgContent) => {
+    if (!msgContent) return
+    sendMessage(username, msgContent.trim(), conversation_id)
     setMessage("")
+
+    setTimeout(() => {
+      messagesBoxRef.current?.scrollToBottom()
+    }, 0)
   }
 
   return (
@@ -19,7 +24,13 @@ export const ChatLayout = ({ name, conversation_id, username, messages, updateMe
         <h2 className="font-semibold text-black">{ name }</h2>
       </header>
 
-      <MessagesBox messages={messages} username={username} updateMessages={updateMessages} conversation_id={conversation_id} />
+      <MessagesBox
+        ref={messagesBoxRef}
+        messages={messages}
+        username={username}
+        updateMessages={updateMessages}
+        conversation_id={conversation_id}
+      />
 
       <footer
         className="h-16 px-4 flex items-center gap-2 border-t border-black/20 bg-blue-300"
