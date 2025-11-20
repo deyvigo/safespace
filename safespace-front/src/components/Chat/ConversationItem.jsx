@@ -25,7 +25,7 @@ export const ConversationItem = ({ name, last_message, date, onClick, active, se
   return (
     <section
       onClick={onClick}
-      className={`w-full h-20 text-black px-4 flex items-center gap-3 cursor-pointer hover:bg-red-300 ${active ? "bg-red-300" : "bg-red-200"}`}>
+      className={`w-full h-20 text-black px-4 flex items-center gap-3 cursor-pointer border-b border-black/20 hover:bg-blue-400 ${active ? "bg-blue-400" : "bg-blue-300"}`}>
       <img
         src="https://i.pravatar.cc/80"
         alt="avatar"

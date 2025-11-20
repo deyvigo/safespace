@@ -28,7 +28,7 @@ export const ConversationBox = ({ selectedConversationId, onSelectConversation, 
   }
 
   return (
-    <div className="min-w-[300px] flex flex-col bg-blue-300">
+    <div className="min-w-[300px] flex flex-col bg-blue-300 border-black/20 border-r">
       {
         conversations.map(({ conversation_id, name, last_name, username, last_message }) => <ConversationItem
           name={`${name} ${last_name}`}

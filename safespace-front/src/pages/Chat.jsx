@@ -10,7 +10,6 @@ export const Chat = () => {
   const [messages, setMessages] = useState([])
   const [conversations, setConversations] = useState([])
   const [selectedConversation, setSelectedConversation] = useState({ id: null, name: null, username: null })
-  const [currentPage, setCurrentPage] = useState(0)
 
   const selectedConversationRef = useRef(selectedConversation)
   const conversationsRef = useRef(conversations)
@@ -76,13 +75,12 @@ export const Chat = () => {
   useEffect(() => {
     if (!selectedConversation.id) {
       setMessages([])
-      setCurrentPage(0)
       return
     }
 
     const fetchMessages = async () => {
       try {
-        const data = await getMessagesByConversation(selectedConversation.id, currentPage, 30)
+        const data = await getMessagesByConversation(selectedConversation.id, 0, 30)
         const batchAsc = data.content.slice().reverse()
         setMessages(batchAsc)
       } catch (error) {
@@ -95,18 +93,21 @@ export const Chat = () => {
 
   return (
     <div className="w-dvw flex flex-row px-14 h-[calc(100vh-5rem)] py-4">
-      <ConversationBox
-        selectedConversationId={selectedConversation.id}
-        onSelectConversation={setSelectedConversation}
-        conversations={conversations}
-        updateConversations={setConversations}
-      />
-      <ChatLayout
-        messages={messages}
-        username={selectedConversation.username}
-        conversation_id={selectedConversation.id}
-        name={selectedConversation.name}
-      />
+      <main className="w-full h-full flex flex-row shadow-xl shadow-black/40">
+        <ConversationBox
+          selectedConversationId={selectedConversation.id}
+          onSelectConversation={setSelectedConversation}
+          conversations={conversations}
+          updateConversations={setConversations}
+        />
+        <ChatLayout
+          messages={messages}
+          username={selectedConversation.username}
+          conversation_id={selectedConversation.id}
+          name={selectedConversation.name}
+          updateMessages={setMessages}
+        />
+      </main>
     </div>
   )
 }
