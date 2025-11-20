@@ -3,7 +3,7 @@ import { ChatLayout } from "../components/Chat/ChatLayout"
 import { ConversationBox } from "../components/Chat/ConversationBox"
 import { AuthContext } from "../context/AuthContext"
 import { connectStomp } from "../services/webSocket"
-import { getConversations, getMessagesByConversation } from "../services/chatService"
+import { getConversations, getMessagesByConversation, markConversationAsRead } from "../services/chatService"
 
 export const Chat = () => {
   const { token, user } = useContext(AuthContext)
@@ -21,10 +21,16 @@ export const Chat = () => {
   useEffect(() => {
     // callback que usa refs y actualizadores funcionales
     const onMessageReceived = (data) => {
-      console.log("mensaje recibido", data)
+      const currentChatId = selectedConversationRef.current.id
+      const inComingChatId = data.chat_id
 
-      // Añadir mensaje sólo si pertenece a la conversación seleccionada
-      if (data.chat_id === selectedConversationRef.current.id) {
+      const isOpen = currentChatId === inComingChatId
+      // Añadir mensaje sólo si pertenece a la conversación seleccionadas
+      if (isOpen) {
+        console.log(`markConversationAsRead(${currentChatId}): actual_user=${JSON.stringify(user)}`)
+        markConversationAsRead(selectedConversationRef.current.id)
+        // Optimistic update
+        data.seen = true
         setMessages(prev => [...prev, data]) // actualizador funcional
       }
 
@@ -39,14 +45,17 @@ export const Chat = () => {
       })
     }
 
+    if (!user || !token) return
+
     const stompClient = connectStomp(user.username, token, "messages", onMessageReceived)
 
     return () => {
-      // cleanup: desconectar stomp para evitar memory leaks / callbacks repetidos
-      try {
-        stompClient && stompClient.disconnect && stompClient.disconnect()
-      } catch (e) {
-        console.warn("Error disconnecting stompClient", e)
+      console.log("Disconnecting from stompClient")
+      if (stompClient && typeof stompClient.disconnect === 'function') {
+        stompClient.disconnect()
+      } else if (stompClient && typeof stompClient.deactivate === 'function') {
+        // Algunas versiones de stompjs usan deactivate
+        stompClient.deactivate();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +65,6 @@ export const Chat = () => {
     const fetchConversations = async () => {
       try {
         const data = await getConversations()
-        // console.log("Conversaciones", data)
         setConversations(data)
       } catch (error) {
         console.error("Error cargando notificaciones iniciales:", error)
@@ -91,6 +99,7 @@ export const Chat = () => {
         selectedConversationId={selectedConversation.id}
         onSelectConversation={setSelectedConversation}
         conversations={conversations}
+        updateConversations={setConversations}
       />
       <ChatLayout
         messages={messages}

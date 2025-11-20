@@ -24,7 +24,7 @@ export const getMessagesByConversation = async (conversation_id, page, size) => 
 
 export const markConversationAsRead = async (conversation_id) => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/chat/conversation/${conversation_id}`, getAuthHeaders())
+    const response = await axios.patch(`${API_BASE_URL}/chat/conversation/${conversation_id}`, {}, getAuthHeaders())
     return response
   } catch (error) {
     console.error("Error al marcar la conversación como leída:", error)

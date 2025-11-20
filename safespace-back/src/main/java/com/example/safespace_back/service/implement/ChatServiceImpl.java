@@ -50,10 +50,12 @@ public class ChatServiceImpl implements ChatService {
                     builder.name(c.getStudent().getName())
                         .lastName(c.getStudent().getLastName())
                         .username(c.getStudent().getUsername());
-                }
+                };
 
-                maybeLastMessage.ifPresent(lastMessage ->
-                    builder.lastMessage(chatMessageMapper.fromChatMessageEntityToDTO(lastMessage))
+                maybeLastMessage.ifPresent(lastMessage -> {
+                        MessageResponseDTO messageDTO = chatMessageMapper.fromChatMessageEntityToDTO(lastMessage);
+                        builder.lastMessage(messageDTO);
+                    }
                 );
 
                 return builder.build();
@@ -70,7 +72,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void markLastMessagesLikeSeen(Long conversationId, UserEntity user) {
-        System.out.println("Holaaa");
+        System.out.println("Conversation to chage " + conversationId + " usuario que lo hara " + user.getUsername());
         ChatEntity chat = chatRepository.findById(conversationId).orElse(null);
 
         if (chat == null) return;
