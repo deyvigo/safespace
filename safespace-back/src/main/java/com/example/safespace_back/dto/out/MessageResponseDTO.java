@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record MessageResponseDTO (
-    Long Id,
+    Long id,
     String content,
     boolean seen,
     LocalDateTime createdAt,

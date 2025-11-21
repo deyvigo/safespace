@@ -10,7 +10,6 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ChatMessageMapper {
-    @Mapping(target = "Id", source = "id")
     @Mapping(target = "chatId", source = "chat.id")
     @Mapping(target = "senderUsername", source = "sender.username")
     MessageResponseDTO fromChatMessageEntityToDTO(ChatMessageEntity chatMessageEntity);

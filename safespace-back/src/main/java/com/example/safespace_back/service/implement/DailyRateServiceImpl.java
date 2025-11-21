@@ -2,7 +2,9 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.internal.AIJsonResponsesHelper;
 import com.example.safespace_back.dto.internal.RateAIResponse;
+import com.example.safespace_back.dto.out.DailyRateResponseDTO;
 import com.example.safespace_back.dto.out.NotificationResponseDTO;
+import com.example.safespace_back.mapper.DailyRateMapper;
 import com.example.safespace_back.mapper.NotificationMapper;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.DailyRateRepository;
@@ -14,25 +16,24 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 
 @Service
 @RequiredArgsConstructor
 public class DailyRateServiceImpl implements DailyRateService {
     private final DailyRateRepository dailyRateRepository;
     private final GeminiAiService geminiAiService;
-    private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final WebSocketService webSocketService;
+    private final DailyRateMapper dailyRateMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -116,5 +117,11 @@ public class DailyRateServiceImpl implements DailyRateService {
         NotificationResponseDTO notificationResponseDTO = notificationMapper.fromEntitytoDTO(saved);
 
         webSocketService.sendNotification(notificationResponseDTO, student.getPsychologist());
+    }
+
+    @Override
+    public Page<DailyRateResponseDTO> getRatesByUser(UserEntity user, Pageable pageable) {
+        Page<DailyRateEntity> dailyRatePage = dailyRateRepository.findAllByStudent_Id(user.getId(), pageable);
+        return dailyRatePage.map(dailyRateMapper::fromEntityToDTO);
     }
 }
