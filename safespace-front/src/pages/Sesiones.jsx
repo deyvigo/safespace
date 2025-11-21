@@ -37,7 +37,8 @@ export default function Sesiones() {
 
   const guardarCambios = () => {
     const actualizados = eventos.map((ev) =>
-      ev.start === eventoSeleccionado.startStr && ev.title === eventoSeleccionado.title
+      ev.start === eventoSeleccionado.startStr &&
+      ev.title === eventoSeleccionado.title
         ? {
             ...ev,
             extendedProps: {
@@ -53,7 +54,11 @@ export default function Sesiones() {
 
   const eliminarSesion = () => {
     const filtrados = eventos.filter(
-      (ev) => !(ev.start === eventoSeleccionado.startStr && ev.title === eventoSeleccionado.title)
+      (ev) =>
+        !(
+          ev.start === eventoSeleccionado.startStr &&
+          ev.title === eventoSeleccionado.title
+        )
     );
     setEventos(filtrados);
     setMostrarPopup(false);
@@ -74,7 +79,9 @@ export default function Sesiones() {
 
   return (
     <div className="p-6 bg-gray-50">
-      <h1 className="text-4xl font-bold text-gray-800 mb-2">Gestión de Sesiones</h1>
+      <h1 className="text-4xl font-bold text-gray-800 mb-2">
+        Gestión de Sesiones
+      </h1>
       <p className="text-gray-600 text-lg">
         Administra tu agenda y registra notas terapéuticas
       </p>
@@ -146,7 +153,9 @@ export default function Sesiones() {
                 </p>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold mb-1">Tipo de sesión:</label>
+                  <label className="block text-sm font-semibold mb-1">
+                    Tipo de sesión:
+                  </label>
                   <select
                     value={tipoEditado}
                     onChange={(e) => setTipoEditado(e.target.value)}
@@ -158,8 +167,10 @@ export default function Sesiones() {
                 </div>
 
                 {tipoEditado === "virtual" && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-1">Link de sesión:</label>
+                  <div className="flex-2 mb-4">
+                    <label className="block text-sm font-semibold mb-1">
+                      Link de sesión:
+                    </label>
                     <input
                       type="text"
                       value={linkEditado}
@@ -170,24 +181,24 @@ export default function Sesiones() {
                   </div>
                 )}
 
-                <div className="flex justify-between mt-6">
+                <div className="flex flex-row justify-between mt-6 gap-4">
                   <button
                     onClick={guardarCambios}
-                    className="bg-green-600 text-white px-4 py-2 rounded-xl"
+                    className="bg-green-600 text-white px-4 py-2 rounded-xl flex-5"
                   >
                     Guardar cambios
+                  </button>
+                  <button
+                    onClick={() => setMostrarPopup(false)}
+                    className="bg-gray-400 text-white px-4 py-2 rounded-xl flex-5"
+                  >
+                    Cancelar
                   </button>
                   <button
                     onClick={eliminarSesion}
                     className="bg-red-500 text-white px-4 py-2 rounded-xl"
                   >
                     Eliminar sesión
-                  </button>
-                  <button
-                    onClick={() => setMostrarPopup(false)}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-xl"
-                  >
-                    Cancelar
                   </button>
                 </div>
               </div>
