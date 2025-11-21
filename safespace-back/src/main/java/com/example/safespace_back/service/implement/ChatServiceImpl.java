@@ -2,7 +2,8 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.out.ConversationResponseDTO;
 import com.example.safespace_back.dto.out.MessageResponseDTO;
-import com.example.safespace_back.dto.out.PsychologistDTO;
+import com.example.safespace_back.exception.ResourceNotFoundException;
+import com.example.safespace_back.exception.UnauthorizedAccessException;
 import com.example.safespace_back.mapper.ChatMessageMapper;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.ChatMessageRepository;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -65,6 +65,20 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Page<MessageResponseDTO> getMessagesResponse(Pageable pageable, UserEntity user, Long conversationId) {
+        ChatEntity chatEntity = chatRepository.findById(conversationId).orElse(null);
+
+        if (chatEntity == null) {
+            throw new ResourceNotFoundException("Conversation id not found");
+        }
+
+        Long userId = user.getId();
+        Long studentId = chatEntity.getStudent().getId();
+        Long  psychologistId = chatEntity.getPsychologist().getId();
+
+        if (!Objects.equals(userId, studentId) && !Objects.equals(userId, psychologistId) ) {
+            throw new UnauthorizedAccessException("You are not authorized to view this message");
+        }
+
         Page<ChatMessageEntity> page = chatMessageRepository.findAllByChat_Id(conversationId, pageable);
 
         return page.map(chatMessageMapper::fromChatMessageEntityToDTO);
