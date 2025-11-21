@@ -42,12 +42,14 @@ export default function SesionBox({ sesion }) {
         >
           Guardar notas
         </button>
-        {/*         <button
-          type="button"
-          className="w-4xl self-center border-2 bg-green-500 text-white"
-        >
-          Marcar como completado
-        </button> */}
+        {
+          <button
+            type="button"
+            className="w-4xl self-center border-2 bg-green-500 text-white"
+          >
+            Marcar como completado
+          </button>
+        }
       </div>
     </div>
   );

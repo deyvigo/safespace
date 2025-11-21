@@ -79,12 +79,22 @@ export default function Sesiones() {
 
   return (
     <div className="p-6 bg-gray-50">
-      <h1 className="text-4xl font-bold text-gray-800 mb-2">
-        Gestión de Sesiones
-      </h1>
-      <p className="text-gray-600 text-lg">
-        Administra tu agenda y registra notas terapéuticas
-      </p>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Gestión de Sesiones
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Administra tu agenda y registra notas terapéuticas
+          </p>
+        </div>
+        <button type="button" className="bg-blue-500 text-white h-14">
+          <div className="flex flex-row justify-center items-center gap-2">
+            <p className="text-3xl">+</p>
+            <p> Agregar sesion</p>
+          </div>
+        </button>
+      </div>
 
       <div className="flex flex-row text-black mt-4 mb-4 gap-4">
         {botones.map((opcion) => (
