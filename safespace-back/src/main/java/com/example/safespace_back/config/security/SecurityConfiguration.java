@@ -53,7 +53,8 @@ public class SecurityConfiguration {
                     "/student",
                     "/moods",
                     "/dailymoods/**",
-                    "/students/**"
+                    "/students/**",
+                    "dailyrates/**"
                 ).hasAuthority("STUDENT")
                 .requestMatchers(
                     "/chat/conversation/**"
