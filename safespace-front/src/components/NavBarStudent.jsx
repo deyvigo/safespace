@@ -126,6 +126,9 @@ export default function NavBarStudent() {
         >
           Dashboard
         </Link>
+        <Link to="/chat" className="hover:text-indigo-200 transition-colors">
+          Chat
+        </Link>
         {token ? (
           <button
             onClick={handleLogout}

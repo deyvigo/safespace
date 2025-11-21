@@ -6,10 +6,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import java.util.List;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ChatMessageMapper {
-    @Mapping(target = "Id", source = "id")
     @Mapping(target = "chatId", source = "chat.id")
     @Mapping(target = "senderUsername", source = "sender.username")
     MessageResponseDTO fromChatMessageEntityToDTO(ChatMessageEntity chatMessageEntity);
+
+    List<MessageResponseDTO> fromChatMessageEntityToDTO(List<ChatMessageEntity> chatMessageEntities);
 }

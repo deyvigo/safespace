@@ -53,8 +53,12 @@ public class SecurityConfiguration {
                     "/student",
                     "/moods",
                     "/dailymoods/**",
-                    "/students/**"
+                    "/students/**",
+                    "dailyrates/**"
                 ).hasAuthority("STUDENT")
+                .requestMatchers(
+                    "/chat/conversation/**"
+                ).hasAnyAuthority("STUDENT", "PSYCHOLOGIST")
                 .anyRequest().authenticated()
             ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
