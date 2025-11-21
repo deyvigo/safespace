@@ -18,6 +18,7 @@ public class DailyMoodEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private LocalDateTime createdAt;
 

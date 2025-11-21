@@ -58,7 +58,20 @@ export default function Login() {
       const response = await login(username, password);
       if (response.token) {
         loginContext(response.token);
-        navigate("/dashboard");
+        
+        // Decodificar el token para obtener el rol del usuario
+        const payload = JSON.parse(atob(response.token.split(".")[1]));
+        const userRole = payload.payload?.role;
+        
+        // Redirigir según el rol
+        if (userRole === "PSYCHOLOGIST") {
+          navigate("/psicologo/dashboard");
+        } else if (userRole === "STUDENT") {
+          navigate("/dashboard");
+        } else {
+          // Por defecto, ir al dashboard de estudiante
+          navigate("/dashboard");
+        }
       }
     } catch (err) {
       setError(

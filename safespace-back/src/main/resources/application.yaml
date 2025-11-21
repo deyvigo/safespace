@@ -30,3 +30,6 @@ logging:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
     org.springframework.security: DEBUG
+
+gemini:
+  api-key: ${GEMINI_API_KEY}

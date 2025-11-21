@@ -16,4 +16,8 @@ public class StudentEntity extends UserEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_faculty")
     private FacultyEntity faculty;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_psychologist")
+    private PsychologistEntity psychologist;
 }
