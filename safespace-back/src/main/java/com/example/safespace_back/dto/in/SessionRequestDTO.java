@@ -16,9 +16,6 @@ public record SessionRequestDTO(
   @Future(message = "Session must be in the future")
   LocalDateTime sessionDateTime,
   
-  @NotNull(message = "Psychologist ID is required")
-  Long psychologistId,
-  
   @Size(max = 500, message = "Reason must not exceed 500 characters")
   String studentReason,
   
