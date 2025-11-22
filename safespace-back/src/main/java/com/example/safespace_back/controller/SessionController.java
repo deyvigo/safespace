@@ -33,7 +33,6 @@ public class SessionController {
   private final SessionService sessionService;
 
   @PostMapping
-  @PreAuthorize("hasRole('STUDENT')")
   public ResponseEntity<SessionResponseDTO> createSession(
       @Valid @RequestBody SessionRequestDTO dto,
       @AuthenticationPrincipal UserEntity user
@@ -43,7 +42,6 @@ public class SessionController {
   }
 
   @GetMapping("/my-sessions")
-  @PreAuthorize("hasRole('STUDENT')")
   public ResponseEntity<List<SessionListDTO>> getMySessionsAsStudent(
       @AuthenticationPrincipal UserEntity user
   ) {
@@ -52,7 +50,6 @@ public class SessionController {
   }
 
   @GetMapping("/pending")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<List<SessionListDTO>> getPendingRequests(
       @AuthenticationPrincipal UserEntity user
   ) {
@@ -61,7 +58,6 @@ public class SessionController {
   }
 
   @GetMapping("/my-appointments")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<List<SessionListDTO>> getMySessionsAsPsychologist(
       @AuthenticationPrincipal UserEntity user
   ) {
@@ -79,7 +75,6 @@ public class SessionController {
   }
 
   @PutMapping("/{id}/status")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<SessionResponseDTO> updateSessionStatus(
       @PathVariable Long id,
       @Valid @RequestBody SessionUpdateDTO dto,
@@ -90,7 +85,6 @@ public class SessionController {
   }
 
   @PutMapping("/{id}/complete")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<SessionResponseDTO> completeSession(
       @PathVariable Long id,
       @Valid @RequestBody SessionUpdateDTO dto,
