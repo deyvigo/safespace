@@ -35,8 +35,27 @@ export const createSentence = async (content) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error al crear sentence:", error);
-    throw error;
+    let errorMessage = "Error al crear la plantilla";
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 403) {
+        errorMessage = "No tienes permiso para crear plantillas";
+      } else if (status === 401) {
+        errorMessage = "No estás autenticado. Por favor, inicia sesión";
+      } else if (status === 400) {
+        errorMessage = error.response.data?.message || "Datos inválidos";
+      } else {
+        errorMessage = error.response.data?.message || `Error del servidor (${status})`;
+      }
+    } else if (error.request) {
+      errorMessage = "No se pudo conectar con el servidor";
+    }
+    
+    console.error("Error al crear sentence:", errorMessage);
+    const customError = new Error(errorMessage);
+    customError.response = error.response;
+    throw customError;
   }
 };
 
@@ -49,8 +68,29 @@ export const updateSentence = async (id, content) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error al actualizar sentence:", error);
-    throw error;
+    let errorMessage = "Error al actualizar la plantilla";
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 403) {
+        errorMessage = "No tienes permiso para actualizar esta plantilla";
+      } else if (status === 401) {
+        errorMessage = "No estás autenticado. Por favor, inicia sesión";
+      } else if (status === 404) {
+        errorMessage = "La plantilla no fue encontrada";
+      } else if (status === 400) {
+        errorMessage = error.response.data?.message || "Datos inválidos";
+      } else {
+        errorMessage = error.response.data?.message || `Error del servidor (${status})`;
+      }
+    } else if (error.request) {
+      errorMessage = "No se pudo conectar con el servidor";
+    }
+    
+    console.error("Error al actualizar sentence:", errorMessage);
+    const customError = new Error(errorMessage);
+    customError.response = error.response;
+    throw customError;
   }
 };
 
@@ -59,8 +99,27 @@ export const deleteSentence = async (id) => {
     await axios.delete(`${getBaseUrl()}sentences/${id}`, getAuthHeaders());
     return true;
   } catch (error) {
-    console.error("Error al eliminar sentence:", error);
-    throw error;
+    let errorMessage = "Error al eliminar la plantilla";
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 403) {
+        errorMessage = "No tienes permiso para eliminar esta plantilla";
+      } else if (status === 401) {
+        errorMessage = "No estás autenticado. Por favor, inicia sesión";
+      } else if (status === 404) {
+        errorMessage = "La plantilla no fue encontrada";
+      } else {
+        errorMessage = error.response.data?.message || `Error del servidor (${status})`;
+      }
+    } else if (error.request) {
+      errorMessage = "No se pudo conectar con el servidor";
+    }
+    
+    console.error("Error al eliminar sentence:", errorMessage);
+    const customError = new Error(errorMessage);
+    customError.response = error.response;
+    throw customError;
   }
 };
 
