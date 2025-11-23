@@ -15,6 +15,17 @@ const getBaseUrl = () => {
   return API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`;
 };
 
+export const getPsichologist = async () => {
+  try {
+    const response = await axios.get(
+      `${getBaseUrl()}students/me/psychologist`,
+      getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 export const createSession = async (sessionData) => {
   try {
     const response = await axios.post(
@@ -22,6 +33,7 @@ export const createSession = async (sessionData) => {
       sessionData,
       getAuthHeaders()
     );
+
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -31,7 +43,7 @@ export const createSession = async (sessionData) => {
 export const cancelSession = async (id, reason) => {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}sessions/${id}/cancel`,
+      `${getBaseUrl()}sessions/${id}/cancel`,
       null,
       {
         ...getAuthHeaders(),
@@ -47,7 +59,7 @@ export const cancelSession = async (id, reason) => {
 export const getSessionById = async (id) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}sessions/${id}`,
+      `${getBaseUrl()}sessions/${id}`,
       getAuthHeaders()
     );
     return response.data;
@@ -59,9 +71,10 @@ export const getSessionById = async (id) => {
 export const getMySessions = async () => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}sessions/my-sessions`,
+      `${getBaseUrl()}sessions/my-sessions`,
       getAuthHeaders()
     );
+    console.log(response);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -71,7 +84,7 @@ export const getMySessions = async () => {
 export const getMyAppointments = async () => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}sessions/my-appointments`,
+      `${getBaseUrl()}sessions/my-appointments`,
       getAuthHeaders()
     );
     return response.data;
@@ -83,7 +96,7 @@ export const getMyAppointments = async () => {
 export const completeSession = async (id) => {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}sessions/${id}/complete`,
+      `${getBaseUrl()}sessions/${id}/complete`,
       null, // sin body
       getAuthHeaders()
     );
@@ -96,7 +109,7 @@ export const completeSession = async (id) => {
 export const updateSessionStatus = async (id) => {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}sessions/${id}/status`,
+      `${getBaseUrl()}sessions/${id}/status`,
       null,
       getAuthHeaders()
     );

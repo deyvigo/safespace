@@ -1,6 +1,6 @@
 // hooks/useCreateSession.js
-import { useState } from 'react';
-import {createSession} from '../../services/sessionService';
+import { useState } from "react";
+import { createSession } from "../../services/sessionService";
 
 export function useCreateSession() {
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,8 @@ export function useCreateSession() {
       return result;
     } catch (err) {
       setError(err);
-      return null;
+      // rethrow so callers can inspect error details
+      throw err;
     } finally {
       setLoading(false);
     }
