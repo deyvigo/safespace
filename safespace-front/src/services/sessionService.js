@@ -93,11 +93,11 @@ export const getMyAppointments = async () => {
   }
 };
 
-export const completeSession = async (id) => {
+export const completeSession = async (id, data) => {
   try {
     const response = await axios.put(
       `${getBaseUrl()}sessions/${id}/complete`,
-      null, // sin body
+      data,
       getAuthHeaders()
     );
     return response.data;
@@ -106,11 +106,23 @@ export const completeSession = async (id) => {
   }
 };
 
-export const updateSessionStatus = async (id) => {
+export const updateSessionStatus = async (id, data) => {
   try {
     const response = await axios.put(
       `${getBaseUrl()}sessions/${id}/status`,
-      null,
+      data,
+      getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const getPendingSessions = async () => {
+  try {
+    const response = await axios.get(
+      `${getBaseUrl()}sessions/pending`,
       getAuthHeaders()
     );
     return response.data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -6,13 +6,13 @@ import SesionBox from "../components/Sesiones/SesionBox";
 import SesionHistorialBox from "../components/Sesiones/SesionHistorial";
 import SesionPendiente from "../components/Sesiones/SesionPendiente";
 import { useGetMyAppointments } from "../hooks/Session/useGetMyAppointments";
+import useGetPendingSessions from "../hooks/Session/useGetPendingSessions";
+import useGetSessionById from "../hooks/Session/useGetSessionById";
 
 export default function Sesiones() {
   const [filtroActivo, setFiltroActivo] = useState("Hoy");
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
   const [mostrarPopup, setMostrarPopup] = useState(false);
-  const [tipoEditado, setTipoEditado] = useState("");
-  const [linkEditado, setLinkEditado] = useState("");
 
   const [eventos, setEventos] = useState([
     {
@@ -20,16 +20,7 @@ export default function Sesiones() {
       start: "2025-11-19T10:00:00",
       end: "2025-11-19T11:00:00",
       extendedProps: {
-        tipo: "virtual",
-        link: "https://meet.example.com/ana",
-      },
-    },
-    {
-      title: "Pedro Sota",
-      start: "2025-11-19T14:00:00",
-      end: "2025-11-19T15:30:00",
-      extendedProps: {
-        tipo: "presencial",
+        type: "virtual",
       },
     },
   ]);
@@ -41,30 +32,26 @@ export default function Sesiones() {
     refresh,
   } = useGetMyAppointments();
 
-  console.log("Appointments from hook:", appointments);
+  const {
+    pendingSessions,
+    loading: pendingLoading,
+    error: pendingError,
+    refresh: refreshPendingSessions,
+  } = useGetPendingSessions();
+
+  const {
+    fetchSession,
+    session: detailedSession,
+    loading: detailedLoading,
+    error: detailedError,
+  } = useGetSessionById();
 
   const mapAppointmentsToEvents = (list) =>
     (list || []).map((appt) => {
       const title =
-        appt.patientName ||
-        appt.title ||
-        (appt.patient
-          ? `${appt.patient.firstName || ""} ${
-              appt.patient.lastName || ""
-            }`.trim()
-          : "Sesión");
-      const start =
-        appt.start ||
-        appt.startDate ||
-        appt.start_time ||
-        appt.fechaInicio ||
-        appt.fecha_inicio;
-      const end =
-        appt.end ||
-        appt.endDate ||
-        appt.end_time ||
-        appt.fechaFin ||
-        appt.fecha_fin;
+        appt.student_name || appt.patientName || appt.title || "Sesión";
+      const start = appt.session_date_time || appt.start || appt.startDate;
+      const end = appt.end_date_time || appt.end || appt.endDate;
       return {
         id: appt.id || appt._id,
         title,
@@ -74,43 +61,30 @@ export default function Sesiones() {
       };
     });
 
-  useEffect(() => {
-    if (appointments && appointments.length > 0) {
-      const mapped = mapAppointmentsToEvents(appointments);
-      setEventos(mapped);
-    }
+  const todaysAppointments = useMemo(() => {
+    if (!appointments) return [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return appointments.filter((appt) => {
+      if (!appt.session_date_time) return false;
+      const apptDate = new Date(appt.session_date_time);
+      const isToday = apptDate.toDateString() === today.toDateString();
+
+      return appt.status === "CONFIRMED" && isToday;
+    });
   }, [appointments]);
 
-  const botones = ["Hoy", "Cronograma", "Pendientes", "Historial"];
+  const confirmedAppointmentsForCalendar = useMemo(() => {
+    if (!appointments) return [];
+    return appointments.filter((appt) => appt.status === "CONFIRMED");
+  }, [appointments]);
 
-  const guardarCambios = () => {
-    const actualizados = eventos.map((ev) =>
-      ev.start === eventoSeleccionado.startStr &&
-      ev.title === eventoSeleccionado.title
-        ? {
-            ...ev,
-            extendedProps: {
-              tipo: tipoEditado,
-              link: tipoEditado === "virtual" ? linkEditado : undefined,
-            },
-          }
-        : ev
-    );
-    setEventos(actualizados);
-    setMostrarPopup(false);
-  };
-
-  const eliminarSesion = () => {
-    const filtrados = eventos.filter(
-      (ev) =>
-        !(
-          ev.start === eventoSeleccionado.startStr &&
-          ev.title === eventoSeleccionado.title
-        )
-    );
-    setEventos(filtrados);
-    setMostrarPopup(false);
-  };
+  const completedAppointments = useMemo(() => {
+    if (!appointments) return [];
+    return appointments.filter((appt) => appt.status === "COMPLETED");
+  }, [appointments]);
 
   const actualizarHorario = (info) => {
     const actualizados = eventos.map((ev) =>
@@ -123,6 +97,20 @@ export default function Sesiones() {
         : ev
     );
     setEventos(actualizados);
+  };
+
+  useEffect(() => {
+    if (confirmedAppointmentsForCalendar.length > 0) {
+      const mapped = mapAppointmentsToEvents(confirmedAppointmentsForCalendar);
+      setEventos(mapped);
+    }
+  }, [confirmedAppointmentsForCalendar]);
+
+  const botones = ["Hoy", "Cronograma", "Pendientes", "Historial"];
+
+  const handleClosePopup = () => {
+    setMostrarPopup(false);
+    setEventoSeleccionado(null);
   };
 
   return (
@@ -158,22 +146,53 @@ export default function Sesiones() {
 
       {filtroActivo === "Hoy" && (
         <div className="flex flex-col gap-10">
-          <SesionBox sesion={{}} />
-          <SesionBox sesion={{}} />
+          {apptLoading && <p>Cargando citas de hoy...</p>}
+          {apptError && (
+            <p className="text-red-500">Error al cargar las citas.</p>
+          )}
+          {!apptLoading && !apptError && todaysAppointments.length > 0
+            ? todaysAppointments.map((sesion) => (
+                <SesionBox
+                  key={sesion.id}
+                  sesion={sesion}
+                  onSessionUpdate={refresh}
+                />
+              ))
+            : !apptLoading && <p>No tienes citas confirmadas para hoy.</p>}
         </div>
       )}
 
       {filtroActivo === "Historial" && (
         <div className="flex flex-col gap-10">
-          <SesionHistorialBox sesion={{}} />
-          <SesionHistorialBox sesion={{}} />
+          {apptLoading && <p>Cargando historial de citas...</p>}
+          {apptError && (
+            <p className="text-red-500">Error al cargar el historial.</p>
+          )}
+          {!apptLoading && !apptError && completedAppointments.length > 0
+            ? completedAppointments.map((sesion) => (
+                <SesionHistorialBox key={sesion.id} sesion={sesion} />
+              ))
+            : !apptLoading && <p>No tienes citas en tu historial.</p>}
         </div>
       )}
 
       {filtroActivo === "Pendientes" && (
         <div className="flex flex-col gap-10">
-          <SesionPendiente sesion={{}} />
-          <SesionPendiente sesion={{}} />
+          {pendingLoading && <p>Cargando sesiones pendientes...</p>}
+          {pendingError && (
+            <p className="text-red-500">
+              Error al cargar las sesiones pendientes.
+            </p>
+          )}
+          {!pendingLoading && !pendingError && pendingSessions?.length > 0
+            ? pendingSessions.map((sesion) => (
+                <SesionPendiente
+                  key={sesion.id}
+                  sesion={sesion}
+                  onSessionUpdate={refreshPendingSessions}
+                />
+              ))
+            : !pendingLoading && <p>No tienes sesiones pendientes.</p>}
         </div>
       )}
 
@@ -188,8 +207,7 @@ export default function Sesiones() {
             events={eventos}
             eventClick={(info) => {
               setEventoSeleccionado(info.event);
-              setTipoEditado(info.event.extendedProps.tipo || "");
-              setLinkEditado(info.event.extendedProps.link || "");
+              fetchSession(info.event.id);
               setMostrarPopup(true);
             }}
             eventDrop={actualizarHorario}
@@ -199,59 +217,59 @@ export default function Sesiones() {
           {mostrarPopup && eventoSeleccionado && (
             <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
               <div className="bg-white p-6 rounded-xl w-96 text-black shadow-xl">
-                <h2 className="text-lg font-bold mb-4">Editar sesión</h2>
+                <h2 className="text-lg font-bold mb-4">
+                  Detalles de la sesión
+                </h2>
 
                 <p className="mb-2">
-                  <strong>Paciente:</strong> {eventoSeleccionado.title}
+                  <strong>Paciente:</strong>{" "}
+                  {eventoSeleccionado.extendedProps.student_name ||
+                    eventoSeleccionado.title}
+                </p>
+                <p className="mb-2">
+                  <strong>Tipo:</strong>{" "}
+                  {eventoSeleccionado.extendedProps.type === "ONLINE"
+                    ? "Virtual"
+                    : "Presencial"}
+                </p>
+                <p className="mb-2">
+                  <strong>Fecha y Hora:</strong>{" "}
+                  {new Date(eventoSeleccionado.start).toLocaleString("es-ES", {
+                    dateStyle: "long",
+                    timeStyle: "short",
+                  })}
                 </p>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold mb-1">
-                    Tipo de sesión:
-                  </label>
-                  <select
-                    value={tipoEditado}
-                    onChange={(e) => setTipoEditado(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md p-2"
-                  >
-                    <option value="presencial">Presencial</option>
-                    <option value="virtual">Virtual</option>
-                  </select>
-                </div>
-
-                {tipoEditado === "virtual" && (
-                  <div className="flex-2 mb-4">
-                    <label className="block text-sm font-semibold mb-1">
-                      Link de sesión:
-                    </label>
-                    <input
-                      type="text"
-                      value={linkEditado}
-                      onChange={(e) => setLinkEditado(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full border border-gray-300 rounded-md p-2"
-                    />
+                {eventoSeleccionado.extendedProps.type === "ONLINE" && (
+                  <div className="mb-4 break-words">
+                    <strong>Link:</strong>{" "}
+                    {detailedLoading ? (
+                      <span>Cargando link...</span>
+                    ) : detailedError ? (
+                      <span className="text-red-500">
+                        Error al cargar el link.
+                      </span>
+                    ) : detailedSession?.link ? (
+                      <a
+                        href={detailedSession.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {detailedSession.link}
+                      </a>
+                    ) : (
+                      <span>No especificado</span>
+                    )}
                   </div>
                 )}
 
-                <div className="flex flex-row justify-between mt-6 gap-4">
+                <div className="flex justify-end mt-6">
                   <button
-                    onClick={guardarCambios}
-                    className="bg-green-600 text-white px-4 py-2 rounded-xl flex-5"
+                    onClick={handleClosePopup}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-xl"
                   >
-                    Guardar cambios
-                  </button>
-                  <button
-                    onClick={() => setMostrarPopup(false)}
-                    className="bg-gray-400 text-white px-4 py-2 rounded-xl flex-5"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={eliminarSesion}
-                    className="bg-red-500 text-white px-4 py-2 rounded-xl"
-                  >
-                    Eliminar sesión
+                    Cerrar
                   </button>
                 </div>
               </div>
