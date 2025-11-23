@@ -19,8 +19,10 @@ import GestionContenidos from "./pages/GestionContenidos";
 
 import Dashboard from "./pages/Dashboard";
 import DashboardPsicologo from "./pages/DashboardPsicologo";
+import Sesiones from "./pages/Sesiones";
 import { Chat } from "./pages/Chat";
 import MensajesIA from "./pages/MensajesIA";
+import SolicitarSesion from "./pages/SolicitarSesion";
 
 function AppContent() {
   const location = useLocation();
@@ -57,6 +59,8 @@ function AppContent() {
         <Route path="/psicologo/dashboard" element={<DashboardPsicologo />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
         <Route path="/gestion-contenidos" element={<GestionContenidos />} />
+        <Route path="/sesiones" element={<Sesiones />} />
+        <Route path="/solicitar-sesion" element={<SolicitarSesion />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/mensajes-ia" element={<MensajesIA />} />
       </Routes>

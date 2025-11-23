@@ -9,7 +9,6 @@ import com.example.safespace_back.dto.out.SessionListDTO;
 import com.example.safespace_back.dto.out.SessionResponseDTO;
 import com.example.safespace_back.model.SessionEntity;
 
-@Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface SessionMapper {
   
