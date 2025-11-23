@@ -18,16 +18,19 @@ export default function Biblioteca() {
     tagsSeleccionadas.length === 0 || tagsSeleccionadas.length === tags.length;
   const TAGS = console.log("Tags seleccionadas:", tagsSeleccionadas);
   return (
-    <div className="p-6 h-full w-full">
-      <div className="text-left mx-5">
-        <h1 className="text-blue-950 text-3xl">📘 Biblioteca</h1>
-        <p className="text-gray-400">
-          Recursos validados por profesionales para tu bienestar emocional
+    <div className="p-6 h-full w-full max-w-7xl m-auto">
+      <div className="sm:text-left text-center mt-3">
+        <h1 className="text-blue-950 text-3xl font-bold sm:text-4xl!">
+          Biblioteca 📘
+        </h1>
+        <p className="text-gray-400 text-base sm:text-xl">
+          <span className="text-cyan-600 font-bold">Recursos validados </span>{" "}
+          por profesionales para tu bienestar emocional
         </p>
       </div>
       <Buscador onBuscar={setBusqueda} />
       <FiltradorTags tags={tags} onFiltrar={setTagsSeleccionadas} />
-      <div className="grid grid-cols-3 gap-10 rounded-3xl mx-5 my-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-10 rounded-3xl my-5">
         {digitalResources
           .filter(
             (r) =>

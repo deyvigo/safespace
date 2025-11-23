@@ -22,10 +22,24 @@ public class AIJsonResponsesHelper {
                 "type", "object",
                 "properties", ImmutableMap.of(
                     "id", ImmutableMap.of("type", "number"),
+                                "icon", ImmutableMap.of("type", "string"),
+                                "title", ImmutableMap.of("type", "string"),
                     "sentence", ImmutableMap.of("type", "string")
                 ),
-                "required", ImmutableList.of("id", "sentence")
+                "required", ImmutableList.of("id","title", "sentence")
             )
         );
     }
+
+    public static ImmutableMap<String, Object> getRateResumeSchema() {
+        return ImmutableMap.of(
+                "type", "object",
+                "properties", ImmutableMap.of(
+                    "title", ImmutableMap.of("type", "string"),
+                        "description", ImmutableMap.of("type", "string")
+                ),
+                "required", ImmutableList.of("title","description")
+        );
+    }
+
 }

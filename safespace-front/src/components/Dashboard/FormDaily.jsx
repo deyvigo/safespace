@@ -38,14 +38,18 @@ export default function FormDaily() {
   };
 
   return (
-    <div className="flex flex-col justify-center flex-2 bg-white border-black border-2 rounded-2xl p-5 mr-5">
+    <div className="flex flex-col justify-center flex-2 bg-white border-black border-2 rounded-2xl p-5">
       {!data?.completed && !estadoRegistrado && (
         <>
-          <h2 className="text-blue-950 text-3xl">¿Cómo te sientes hoy?</h2>
-          <p className="text-gray-400 mb-4">
-            Selecciona tu estado emocional actual
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 mb-6">
+          <div className="w-full text-center sm:text-left">
+            <h2 className="text-blue-950 font-bold text-2xl! sm:text-3xl!">
+              ¿Cómo te sientes hoy?
+            </h2>
+            <p className="text-gray-400 mb-4 text-base sm:text-xl">
+              Selecciona tu estado emocional actual
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6">
             {emociones.map(({ id, name, icon }) => (
               <EmotionBox
                 key={id}
@@ -57,10 +61,10 @@ export default function FormDaily() {
             ))}
           </div>
           <button
-            className={`bg-blue-300 text-white font-bold py-2 px-4 rounded w-full ${
+            className={`bg-blue-400 text-white font-bold py-2 px-4 rounded w-full ${
               seleccionadas.length === 0
                 ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-blue-400 cursor-pointer"
+                : "hover:bg-cyan-600 cursor-pointer"
             }`}
             type="button"
             onClick={registrarEstado}
@@ -72,27 +76,39 @@ export default function FormDaily() {
       )}
 
       {estadoRegistrado && !formularioEnviado && (
-        <div className="mt-6">
-          <h2 className="text-blue-950 text-2xl">
-            ¿Quieres agregar algo más sobre tu día?
-          </h2>
-          <p className="text-gray-400 mb-2">Este campo es opcional</p>
+        <div className="">
+          <div className="mb-4 text-center sm:text-left w-full">
+            <h2 className="text-blue-950 text-2xl! font-bold sm:text-3xl!">
+              ¿Quieres agregar algo más?
+            </h2>
+            <p className="text-gray-400 mb-2 text-base sm:text-xl">Este campo es opcional</p>
+          </div>
+
           <textarea
-            className="w-full border border-gray-300 rounded p-2 mb-4 placeholder-gray-400 text-black"
+            className="w-full border border-gray-500 rounded p-2 mb-4 placeholder-gray-400 text-black"
             rows="4"
             placeholder="Escribe aquí lo que quieras compartir..."
             value={textoDia}
             onChange={(e) => setTextoDia(e.target.value)}
           />
-          <button
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full"
-            type="button"
-            onClick={() =>
-              sendMood({ moods: seleccionadas, description: textoDia })
-            }
-          >
-            Enviar formulario
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              className="bg-green-500 hover:bg-green-600 border-2 hover:border-green-900 border-green-600 transition-all duration-100 text-white font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
+              type="button"
+              onClick={() =>
+                sendMood({ moods: seleccionadas, description: textoDia })
+              }
+            >
+              Enviar formulario
+            </button>
+            <button
+              className="border-2 border-red-400 hover:bg-red-500 hover:text-white hover:border-red-800 transition-all duration-100 text-gray-600 font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
+              type="button"
+              onClick={()=>{setEstadoRegistrado(false)}}
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
 
