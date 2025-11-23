@@ -20,6 +20,7 @@ import com.example.safespace_back.dto.in.ScheduleConfigDTO;
 import com.example.safespace_back.dto.in.ScheduleExceptionDTO;
 import com.example.safespace_back.dto.out.PsychologistAvailabilityDTO;
 import com.example.safespace_back.dto.out.TimeSlotDTO;
+import com.example.safespace_back.model.StudentEntity;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.service.AvailabilityService;
 
@@ -34,7 +35,6 @@ public class AvailabilityController {
   private final AvailabilityService availabilityService;
 
   @PostMapping("/schedule")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<Void> setWeeklySchedule(
     @Valid @RequestBody List<ScheduleConfigDTO> schedules,
     @AuthenticationPrincipal UserEntity user
@@ -44,7 +44,6 @@ public class AvailabilityController {
   }
 
   @PostMapping("/exceptions")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<Void> addException(
     @Valid @RequestBody ScheduleExceptionDTO exception,
     @AuthenticationPrincipal UserEntity user
@@ -54,7 +53,6 @@ public class AvailabilityController {
   }
 
   @GetMapping("/my-schedule")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<PsychologistAvailabilityDTO> getMySchedule(
       @AuthenticationPrincipal UserEntity user
   ) {
@@ -63,7 +61,6 @@ public class AvailabilityController {
   }
 
   @DeleteMapping("/schedule/{scheduleId}")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<Void> deleteSchedule(
     @PathVariable Long scheduleId,
     @AuthenticationPrincipal UserEntity user
@@ -73,7 +70,6 @@ public class AvailabilityController {
   }
 
   @DeleteMapping("/exceptions/{exceptionId}")
-  @PreAuthorize("hasRole('PSYCHOLOGIST')")
   public ResponseEntity<Void> deleteException(
     @PathVariable Long exceptionId,
     @AuthenticationPrincipal UserEntity user
@@ -97,6 +93,40 @@ public class AvailabilityController {
     @PathVariable Long id
   ) {
     PsychologistAvailabilityDTO availability = availabilityService.getPsychologistSchedule(id);
+    return ResponseEntity.ok(availability);
+  }
+
+  @GetMapping("/my-psychologist/slots")
+  public ResponseEntity<List<TimeSlotDTO>> getMyPsychologistAvailableSlots(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+    @AuthenticationPrincipal UserEntity user
+  ) {
+    if (!(user instanceof StudentEntity)) {
+      throw new IllegalStateException("Only students can access this endpoint");
+    }
+    StudentEntity student = (StudentEntity) user;
+    if (student.getPsychologist() == null) {
+      throw new IllegalStateException("Student does not have an assigned psychologist");
+    }
+    Long psychologistId = student.getPsychologist().getId();
+    List<TimeSlotDTO> slots = availabilityService.getAvailableSlots(psychologistId, startDate, endDate);
+    return ResponseEntity.ok(slots);
+  }
+
+  @GetMapping("/my-psychologist")
+  public ResponseEntity<PsychologistAvailabilityDTO> getMyPsychologistSchedule(
+    @AuthenticationPrincipal UserEntity user
+  ) {
+    if (!(user instanceof StudentEntity)) {
+      throw new IllegalStateException("Only students can access this endpoint");
+    }
+    StudentEntity student = (StudentEntity) user;
+    if (student.getPsychologist() == null) {
+      throw new IllegalStateException("Student does not have an assigned psychologist");
+    }
+    Long psychologistId = student.getPsychologist().getId();
+    PsychologistAvailabilityDTO availability = availabilityService.getPsychologistSchedule(psychologistId);
     return ResponseEntity.ok(availability);
   }
 }

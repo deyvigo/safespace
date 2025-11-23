@@ -2,10 +2,15 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.internal.AIJsonResponsesHelper;
 import com.example.safespace_back.dto.internal.SentenceAIResponse;
+import com.example.safespace_back.dto.out.PsychologistDTO;
+import com.example.safespace_back.exception.ResourceNotFoundException;
+import com.example.safespace_back.mapper.PsychologistMapper;
 import com.example.safespace_back.model.DailyMoodEntity;
+import com.example.safespace_back.model.PsychologistEntity;
 import com.example.safespace_back.model.SentenceEntity;
 import com.example.safespace_back.model.StudentEntity;
 import com.example.safespace_back.repository.DailyMoodRepository;
+import com.example.safespace_back.repository.PsychologistRepository;
 import com.example.safespace_back.repository.SentenceRepository;
 import com.example.safespace_back.service.GeminiAiService;
 import com.example.safespace_back.service.StudentService;
@@ -14,7 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +31,8 @@ public class StudentServiceImpl implements StudentService {
     private final SentenceRepository sentenceRepository;
     private final GeminiAiService geminiAiService;
     private final DailyMoodRepository dailyMoodRepository;
+    private final PsychologistMapper psychologistMapper;
+    private final PsychologistRepository psychologistRepository;
 
     @Override
     public List<SentenceAIResponse> getCustomSentenceByAI(StudentEntity student) {
@@ -67,5 +76,14 @@ public class StudentServiceImpl implements StudentService {
         }
 
         return customSentences;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PsychologistDTO getPsychologist(StudentEntity student) {
+      PsychologistEntity pyschologist = psychologistRepository.findById(student.getPsychologist().getId())
+        .orElseThrow(() -> new ResourceNotFoundException("Psychologist not found"));
+
+      return psychologistMapper.toPsychologistDTO(pyschologist);
     }
 }
