@@ -77,8 +77,12 @@ export const MessagesBox = forwardRef(({ messages, username, updateMessages, con
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto px-4 py-2 space-y-3"
+      className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white"
       onScroll={handleScroll}
+      style={{
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#cbd5e1 transparent'
+      }}
     >
       {
         messages.map(({ id, content, created_at, sender_username }) => <MessageItem key={id} sender={username === sender_username ? "other" : "me"} message={content} date={created_at} />)
