@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import SesionBox from "../components/Sesiones/SesionBox";
 import SesionHistorialBox from "../components/Sesiones/SesionHistorial";
 import SesionPendiente from "../components/Sesiones/SesionPendiente";
+import { useGetMyAppointments } from "../hooks/Session/useGetMyAppointments";
 
 export default function Sesiones() {
   const [filtroActivo, setFiltroActivo] = useState("Hoy");
@@ -32,6 +33,53 @@ export default function Sesiones() {
       },
     },
   ]);
+
+  const {
+    appointments,
+    loading: apptLoading,
+    error: apptError,
+    refresh,
+  } = useGetMyAppointments();
+
+  console.log("Appointments from hook:", appointments);
+
+  const mapAppointmentsToEvents = (list) =>
+    (list || []).map((appt) => {
+      const title =
+        appt.patientName ||
+        appt.title ||
+        (appt.patient
+          ? `${appt.patient.firstName || ""} ${
+              appt.patient.lastName || ""
+            }`.trim()
+          : "Sesión");
+      const start =
+        appt.start ||
+        appt.startDate ||
+        appt.start_time ||
+        appt.fechaInicio ||
+        appt.fecha_inicio;
+      const end =
+        appt.end ||
+        appt.endDate ||
+        appt.end_time ||
+        appt.fechaFin ||
+        appt.fecha_fin;
+      return {
+        id: appt.id || appt._id,
+        title,
+        start,
+        end,
+        extendedProps: { ...appt },
+      };
+    });
+
+  useEffect(() => {
+    if (appointments && appointments.length > 0) {
+      const mapped = mapAppointmentsToEvents(appointments);
+      setEventos(mapped);
+    }
+  }, [appointments]);
 
   const botones = ["Hoy", "Cronograma", "Pendientes", "Historial"];
 
@@ -88,12 +136,7 @@ export default function Sesiones() {
             Administra tu agenda y registra notas terapéuticas
           </p>
         </div>
-        <button type="button" className="bg-blue-500 text-white h-14">
-          <div className="flex flex-row justify-center items-center gap-2">
-            <p className="text-3xl">+</p>
-            <p> Agregar sesion</p>
-          </div>
-        </button>
+        {/* botón de crear sesión eliminado — la creación se gestiona desde la página del estudiante */}
       </div>
 
       <div className="flex flex-row text-black mt-4 mb-4 gap-4">
