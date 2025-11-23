@@ -28,6 +28,7 @@ public class StudentController {
     @GetMapping("/me/resume")
     public ResponseEntity<RateResumeAIResponse> getWeekResume(@AuthenticationPrincipal StudentEntity student) {
         return ResponseEntity.ok(studentService.getRateWeekResume(student));
+    }
 
     @GetMapping("/me/psychologist")
     public ResponseEntity<PsychologistDTO> getMyPsychologist(
