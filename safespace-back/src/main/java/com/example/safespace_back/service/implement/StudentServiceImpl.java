@@ -2,6 +2,7 @@ package com.example.safespace_back.service.implement;
 
 import com.example.safespace_back.dto.internal.AIJsonResponsesHelper;
 import com.example.safespace_back.dto.internal.SentenceAIResponse;
+import com.example.safespace_back.dto.internal.RateResumeAIResponse;
 import com.example.safespace_back.dto.out.PsychologistDTO;
 import com.example.safespace_back.exception.ResourceNotFoundException;
 import com.example.safespace_back.mapper.PsychologistMapper;
@@ -34,6 +35,20 @@ public class StudentServiceImpl implements StudentService {
     private final PsychologistMapper psychologistMapper;
     private final PsychologistRepository psychologistRepository;
 
+    private StringBuilder getLastMoodsContent(StudentEntity student){
+        StringBuilder content = new StringBuilder();
+        LocalDateTime start = LocalDateTime.now().minusDays(5).toLocalDate().atStartOfDay();
+        LocalDateTime end = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+        List<DailyMoodEntity> lastMoods = dailyMoodRepository.findAllByCreatedAtBetweenAndStudent_Id(start, end, student.getId());
+
+        lastMoods.forEach(mood -> {
+            content.append(mood.getCreatedAt().toLocalDate()).append(": ");
+            mood.getMoods().forEach(moodEntity -> { content.append(moodEntity.getName()).append(",");});
+            content.append(mood.getDescription()).append("\n");
+        });
+        return content;
+    }
+
     @Override
     public List<SentenceAIResponse> getCustomSentenceByAI(StudentEntity student) {
         List<SentenceEntity> sentences = sentenceRepository.findAll();
@@ -47,19 +62,9 @@ public class StudentServiceImpl implements StudentService {
         content.append("El estado del usuario es.\n");
 
         // get last 5 days dailymood
-        LocalDateTime start = LocalDateTime.now().minusDays(5).toLocalDate().atStartOfDay();
-        LocalDateTime end = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
-        List<DailyMoodEntity> lastMoods = dailyMoodRepository.findAllByCreatedAtBetweenAndStudent_Id(start, end, student.getId());
+        content.append(getLastMoodsContent(student));
 
-        lastMoods.forEach(mood -> {
-            content.append(mood.getCreatedAt().toLocalDate()).append(": ");
-            mood.getMoods().forEach(moodEntity -> { content.append(moodEntity.getName()).append(",");});
-            content.append(mood.getDescription()).append("\n");
-        });
-
-        content.append("Genera entre 5 a 10 frases.");
-
-        System.out.println(content.toString());
+        content.append("Genera entre 5 a 10 frases donde cada uno debe tener un titulo corto que represente la frase junto con un emoji.");
 
         ImmutableMap<String, Object> schema = AIJsonResponsesHelper.getSentenceSchema();
 
@@ -68,7 +73,6 @@ public class StudentServiceImpl implements StudentService {
         try {
             String aiResponse = geminiAiService.askSome("gemini-2.5-flash", schema, content.toString()).get();
             // TODO: add excepcionally to throw custom exception for ia operations
-
             ObjectMapper mapper = new ObjectMapper();
             customSentences = mapper.readValue(aiResponse, new TypeReference<List<SentenceAIResponse>>() {});
         } catch (Exception e) {
@@ -79,6 +83,27 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public RateResumeAIResponse getRateWeekResume(StudentEntity student){
+        StringBuilder content = new StringBuilder();
+        content.append("Eres un asistente de psicólogo y estás ayudando a un estudiante a sentirse mejor.\n");
+        content.append("El estado del usuario es.\n");
+        content.append(getLastMoodsContent(student));
+        content.append("Las respuestas que generen siempre deberan empezar en mayuscula \n");
+        content.append("Dado esta trayectoria de emociones tienes que generar un dignostico corto entre 20 a 28 palabras en segunda persona de como se sintio el estudiante en un lenguaje claro \n");
+        content.append("Adicionalmente deberas de entregar tambien un titulo de 2 a 3 palabras que indica que tipo de tendencia tuvo el estudiante. Este titulo siempre debera empezar con la palabra Tendencia" );
+        ImmutableMap<String, Object> schema = AIJsonResponsesHelper.getRateResumeSchema();
+        RateResumeAIResponse customResume = new RateResumeAIResponse("", "");
+        try {
+            String aiResponse = geminiAiService.askSome("gemini-2.5-flash", schema, content.toString()).get();
+            ObjectMapper mapper = new ObjectMapper();
+            customResume = mapper.readValue(aiResponse, new TypeReference<RateResumeAIResponse>() {});
+        } catch (Exception e) {
+            System.err.println("Error al procesar la IA:" + e.getMessage());
+        }
+        return customResume;
+
+    }
+
     @Transactional(readOnly = true)
     public PsychologistDTO getPsychologist(StudentEntity student) {
       PsychologistEntity pyschologist = psychologistRepository.findById(student.getPsychologist().getId())

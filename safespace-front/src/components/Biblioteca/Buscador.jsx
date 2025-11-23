@@ -21,7 +21,7 @@ export default function Buscador({ onBuscar }) {
       placeholder="Buscar recursos, categorias o temas..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
-      className="border border-gray-300 rounded px-3 py-4 w-2xl text-black mx-5 my-4"
+      className="border border-gray-300 rounded px-3 py-4 w-full text-black mt-2 mb-6"
     />
   );
 }

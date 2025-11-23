@@ -130,3 +130,16 @@ export const getPendingSessions = async () => {
     throw error.response?.data || error;
   }
 };
+
+export const getMySessionsAsPsychologist = async () => {
+  try {
+    const response = await axios.get(
+      `${getBaseUrl()}sessions/my-appointments`,
+      getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener sesiones del psicólogo:", error);
+    throw error;
+  }
+};

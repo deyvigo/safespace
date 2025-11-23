@@ -3,8 +3,8 @@ spring:
     name: safespace
   datasource:
     url: jdbc:postgresql://localhost:5432/ss-database
-    username: ss-user
-    password: secure-password
+    username: postgres
+    password:
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,7 +18,7 @@ spring:
 
 security:
   jwt:
-    secret-key: miasuperaclaveasecretakasklaslkasdadea32abyasdaasdsdadtes
+    secret-key:
     expiration-time: 604800000
 
 springdoc:
@@ -32,4 +32,8 @@ logging:
     org.springframework.security: DEBUG
 
 gemini:
-  api-key: ${GEMINI_API_KEY}
+  api-key:
+cloudinary:
+  cloud-name:
+  api-key:
+  api-secret: 

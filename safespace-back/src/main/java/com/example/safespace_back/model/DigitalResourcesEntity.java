@@ -2,7 +2,8 @@ package com.example.safespace_back.model;
 
 import java.util.HashSet;
 import java.util.Set;
-
+import java.util.List;
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,4 +33,7 @@ public class DigitalResourcesEntity {
 
     @ManyToMany(mappedBy = "favoriteResources")
     private Set<UserEntity> favoritedBy = new HashSet<>();
+
+    @OneToMany(mappedBy = "resourceParent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ImageMetadataEntity> images = new ArrayList<>();
 }

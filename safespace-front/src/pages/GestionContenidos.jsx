@@ -15,6 +15,7 @@ const INITIAL_FORM_DATA = {
   category: "BIENESTAR",
   type: "ARTICLE",
   link: "",
+  images: [],
 };
 
 export default function GestionContenidos() {
@@ -35,7 +36,12 @@ export default function GestionContenidos() {
     setError("");
     try {
       const data = await getDigitalResources();
-      setResources(data);
+      setResources(
+        data?.map((el) => ({
+          ...el,
+          images: el.images?.map((sub) => [sub.public_url]) || [],
+        })) || []
+      );
     } catch (err) {
       setError("Error al cargar los contenidos");
       console.error(err);
@@ -59,6 +65,7 @@ export default function GestionContenidos() {
       category: resource.category || "BIENESTAR",
       type: resource.type || "ARTICLE",
       link: resource.link || "",
+      images: resource.images || []
     });
     setError("");
     setShowModal(true);
@@ -80,7 +87,6 @@ export default function GestionContenidos() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       if (editingResource) {
         await updateDigitalResource(editingResource.id, formData);

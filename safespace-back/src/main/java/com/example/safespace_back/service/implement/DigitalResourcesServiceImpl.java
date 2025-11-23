@@ -13,9 +13,12 @@ import com.example.safespace_back.exception.UnauthorizedAccessException;
 import com.example.safespace_back.mapper.DigitalResourceMapper;
 import com.example.safespace_back.model.DigitalResourcesEntity;
 import com.example.safespace_back.model.PsychologistEntity;
+import com.example.safespace_back.model.ImageMetadataEntity;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.repository.DigitalResourcesRepository;
 import com.example.safespace_back.service.DigitalResourcesService;
+import com.example.safespace_back.service.ImageMetadataService;
+import java.util.ArrayList;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +28,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
 
   private final DigitalResourcesRepository digitalResourcesRepository;
   private final DigitalResourceMapper digitalResourceMapper;
+  private final ImageMetadataService imageMetadataService;
 
   @Override
   @Transactional
@@ -40,8 +44,19 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
     entity.setType(digitalResourceDTO.type());
     entity.setLink(digitalResourceDTO.link());
     entity.setPsychologist((PsychologistEntity) currentUser);
+    entity = digitalResourcesRepository.save(entity);
+    if (digitalResourceDTO.images() != null && !digitalResourceDTO.images().isEmpty()) {
+        List<ImageMetadataEntity> imageEntities = new ArrayList<>();
 
-    return digitalResourceMapper.toDTO(digitalResourcesRepository.save(entity));
+        for (String base64 : digitalResourceDTO.images()) {
+              ImageMetadataEntity img = imageMetadataService.uploadAndCreate(base64, entity);
+              imageEntities.add(img);
+        }
+
+        entity.setImages(imageEntities);
+    }
+
+    return digitalResourceMapper.toDTO(entity);
   }
 
   @Override
@@ -55,7 +70,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
   @Override
   @Transactional(readOnly = true)
   public List<DigitalResourceResponseDTO> findAll() {
-    return digitalResourcesRepository.findAll()
+    return digitalResourcesRepository.findAllWithImages()
       .stream()
       .map(digitalResourceMapper::toDTO)
       .collect(Collectors.toList());

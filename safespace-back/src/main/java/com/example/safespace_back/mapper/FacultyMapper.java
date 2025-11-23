@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FacultyMapper {
     FacultyDTO toDTO(FacultyEntity userEntity);

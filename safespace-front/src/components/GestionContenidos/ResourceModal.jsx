@@ -1,4 +1,65 @@
 import { CATEGORIES, TYPES } from "../../constants/digitalResources";
+import { Plus, X } from "lucide-react";
+import { useEffect } from "react";
+
+const convertImageToWebP = (file) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    img.onload = () => {
+      let { width, height } = img;
+      const MAX_WIDTH = 1200;
+      const MAX_HEIGHT = 800;
+
+      if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Error al convertir la imagen a WebP"));
+          }
+        },
+        "image/webp",
+        0.7
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error("Error al cargar la imagen"));
+    };
+
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+const convertToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Error al convertir a Base64"));
+      }
+    };
+    reader.onerror = () => {
+      reject(new Error("Error al leer el archivo"));
+    };
+    reader.readAsDataURL(blob);
+  });
+};
 
 export default function ResourceModal({
   isOpen,
@@ -9,6 +70,78 @@ export default function ResourceModal({
   onSubmit,
   onChange,
 }) {
+  useEffect(() => {
+    if (!editingResource) {
+      const savedForm = localStorage.getItem("savedCreateForm");
+      if (savedForm) {
+        try {
+          onChange(JSON.parse(savedForm));
+        } catch (err) {
+          console.error("Error parsing stored form", err);
+        }
+      }
+    }
+  }, [editingResource, onChange, isOpen]);
+  console.log(formData);
+  useEffect(() => {
+    if (!editingResource) {
+      localStorage.setItem("savedCreateForm", JSON.stringify(formData));
+    }
+  }, [formData, editingResource]);
+
+  const handleImageUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const currentImageCount = formData.images.length;
+    const newImageCount = currentImageCount + files.length;
+
+    if (newImageCount > 3) {
+      return;
+    }
+
+    const newBase64Images = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      if (file.size > 5 * 1024 * 1024) {
+        continue;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        continue;
+      }
+
+      try {
+        const webpImage = await convertImageToWebP(file);
+        const base64 = await convertToBase64(webpImage);
+
+        if (base64.length > 400000) {
+          continue;
+        }
+
+        newBase64Images.push(base64);
+      } catch (error) {
+        console.error(`Error processing image ${file.name}:`, error);
+      }
+    }
+
+    if (newBase64Images.length > 0) {
+      onChange((prev) => ({
+        ...prev,
+        images: [...prev.images, ...newBase64Images],
+      }));
+    }
+  };
+
+  const removeImage = (index) => {
+    onChange((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -138,6 +271,54 @@ export default function ResourceModal({
               />
             </div>
 
+            {/* Imagenes */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Imágenes
+              </label>
+              <div className="relative border border-gray-300 bg-white rounded-lg h-32 w-full flex justify-center items-center cursor-pointer overflow-hidden">
+                <div className="flex flex-col items-center">
+                  <Plus
+                    width={40}
+                    height={40}
+                    strokeWidth={2}
+                    className="text-gray-500 dark:text-gray-400"
+                  />
+                  <span className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+                    Subir imágenes
+                  </span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  multiple
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
+            </div>
+            {formData.images.length > 0 && (
+              <div className="flex gap-2 overflow-auto mb-4">
+                {formData.images.map((img, index) => (
+                  <div key={index} className="flex-none sm:flex-1 relative">
+                    <img
+                      src={img}
+                      alt={`Imagen ${index + 1}`}
+                      width={220}
+                      height={100}
+                      className="sm:w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 left-1 bg-blue-500 text-white hover:cursor-pointer! rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      <X size={16} strokeWidth={3} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 animate-[fadeIn_0.2s_ease-out]">
@@ -167,4 +348,3 @@ export default function ResourceModal({
     </>
   );
 }
-

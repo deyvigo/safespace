@@ -4,9 +4,14 @@ import { API_BASE_URL } from "./apiURL"
 
 let stompClient = null
 
+// Asegurar que la URL base termine con /
+const getBaseUrl = () => {
+  return API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
+};
+
 export const connectStomp = (username, token, service, onMessage) => {
   stompClient = new Client({
-    webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws`),
+    webSocketFactory: () => new SockJS(`${getBaseUrl()}ws`),
     connectHeaders: {
       'Authorization': `Bearer ${token}`
     },

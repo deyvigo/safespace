@@ -1,6 +1,7 @@
 package com.example.safespace_back.controller;
 
 import com.example.safespace_back.dto.internal.SentenceAIResponse;
+import com.example.safespace_back.dto.internal.RateResumeAIResponse;
 import com.example.safespace_back.dto.out.PsychologistDTO;
 import com.example.safespace_back.mapper.PsychologistMapper;
 import com.example.safespace_back.model.StudentEntity;
@@ -23,6 +24,10 @@ public class StudentController {
     @GetMapping("/me/sentences")
     public ResponseEntity<List<SentenceAIResponse>> getCustomSentences(@AuthenticationPrincipal StudentEntity student) {
         return ResponseEntity.ok(studentService.getCustomSentenceByAI(student));
+    }
+    @GetMapping("/me/resume")
+    public ResponseEntity<RateResumeAIResponse> getWeekResume(@AuthenticationPrincipal StudentEntity student) {
+        return ResponseEntity.ok(studentService.getRateWeekResume(student));
     }
 
     @GetMapping("/me/psychologist")

@@ -30,7 +30,7 @@ export default function FiltradorTags({ tags, onFiltrar }) {
     <button
       key={tag}
       onClick={() => toggleTag(tag)}
-      className={`px-3 py-1 rounded-full border transition ${
+      className={`px-5 sm:px-3 py-1 rounded-full text-sm sm:text-base border transition ${
         isActive
           ? "bg-blue-600 text-white border-blue-600"
           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -41,7 +41,7 @@ export default function FiltradorTags({ tags, onFiltrar }) {
   );
 
   return (
-    <div className="flex flex-wrap gap-2 mx-5">
+    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
       {renderTag("Todos", todosActivos)}
       {tags.map((tag) => renderTag(tag, tagsActivas.includes(tag)))}
     </div>
