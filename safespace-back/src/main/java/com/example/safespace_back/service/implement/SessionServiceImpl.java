@@ -21,6 +21,7 @@ import com.example.safespace_back.model.StudentEntity;
 import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.repository.PsychologistRepository;
 import com.example.safespace_back.repository.SessionRepository;
+import com.example.safespace_back.repository.StudentRepository;
 import com.example.safespace_back.service.SessionService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,17 +32,25 @@ public class SessionServiceImpl implements SessionService {
 
   private final SessionRepository sessionRepository;
   private final PsychologistRepository psychologistRepository;
+  private final StudentRepository studentRepository;
   private final SessionMapper sessionMapper;
 
   @Override
   @Transactional
-  public SessionResponseDTO createSession(SessionRequestDTO dto, UserEntity student) {
-    if (!(student instanceof StudentEntity)) {
+  public SessionResponseDTO createSession(SessionRequestDTO dto, UserEntity currentUser) {
+    if (!(currentUser instanceof StudentEntity)) {
       throw new UnauthorizedAccessException("Only students can create sessions");
     }
 
-    PsychologistEntity psychologist = psychologistRepository.findById(dto.psychologistId())
-        .orElseThrow(() -> new ResourceNotFoundException("Psychologist not found"));
+    StudentEntity student = studentRepository.findById(currentUser.getId())
+      .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    PsychologistEntity psychologist = student.getPsychologist();
+    
+    // Validate that student has an assigned psychologist
+    if (psychologist == null) {
+      throw new IllegalStateException("Student does not have an assigned psychologist");
+    }
 
     if (dto.sessionDateTime().isBefore(LocalDateTime.now())) {
       throw new IllegalArgumentException("Session date must be in the future");
@@ -51,7 +60,7 @@ public class SessionServiceImpl implements SessionService {
     LocalDateTime sessionEnd = dto.sessionDateTime().plusMinutes(duration);
 
     List<SessionEntity> overlappingSessions = sessionRepository.findOverlappingSessions(
-        dto.psychologistId(),
+        psychologist.getId(),
         student.getId(),
         dto.sessionDateTime(),
         sessionEnd
