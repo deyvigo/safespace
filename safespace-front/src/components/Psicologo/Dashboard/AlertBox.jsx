@@ -21,6 +21,8 @@ export const AlertBox = () => {
   }, [])
 
   useEffect(() => {
+    if (!user || !token) return;
+
     const client = connectStomp(user.username, token, 'notifications', (data) => {
       // console.log(data) // para ver el formato de las notificaciones que llegan
       setNotifications((prev) => [data, ...prev])
@@ -29,7 +31,7 @@ export const AlertBox = () => {
     return () => {
       client?.deactivate?.()
     }
-  }, [])
+  }, [user, token])
 
   return (
     <div className="space-y-4 overflow-x-auto">

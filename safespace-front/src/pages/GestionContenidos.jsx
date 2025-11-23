@@ -36,7 +36,12 @@ export default function GestionContenidos() {
     setError("");
     try {
       const data = await getDigitalResources();
-      setResources(data?.map((el) => ({...el,images: el.images.map((sub) => [sub.public_url])})));
+      setResources(
+        data?.map((el) => ({
+          ...el,
+          images: el.images?.map((sub) => [sub.public_url]) || [],
+        })) || []
+      );
     } catch (err) {
       setError("Error al cargar los contenidos");
       console.error(err);
