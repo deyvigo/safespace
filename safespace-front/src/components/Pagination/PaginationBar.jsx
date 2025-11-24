@@ -8,7 +8,7 @@ import {
 
 const PAGESIZES = [
   { value: 1, label: 1 },
-  { value: 5, label: 5 },
+  { value: 6, label: 6 },
   { value: 10, label: 10 },
   { value: 20, label: 20 },
 ];

@@ -1,25 +1,42 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Buscador from "../components/Biblioteca/Buscador";
 import FiltradorTags from "../components/Biblioteca/FiltradorTags";
 import RecursoBox from "../components/Biblioteca/RecursoBox";
 import useGetAllDigitalResources from "../hooks/DigitalResources/useGetAllDigitalResources";
+import usePaginationController from "../hooks/Pagination/usePaginationController";
+import { AuthContext } from "../context/AuthContext";
+import PaginationBar from "../components/Pagination/PaginationBar";
+import { CATEGORIES, TYPES } from "../constants/digitalResources";
 
 export default function Biblioteca() {
-  const [busqueda, setBusqueda] = useState("");
-  console.log(busqueda);
-  const [tagsFiltrados, setTagsFiltrados] = useState([]);
-  const { digitalResources, loading, error } = useGetAllDigitalResources();
-  const tags = digitalResources.map(
-    (digitalResource) => digitalResource.category
+  const [typeSelect, setTypeSelect] = useState("");
+  const [categorySelect, setCategorySelect] = useState("");
+  const { user } = useContext(AuthContext);
+  const {
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalSize,
+    setTotalSize,
+  } = usePaginationController();
+  const {
+    digitalResources,
+    loading,
+    error,
+    setError,
+    fetchDigitalResources: refresh,
+  } = useGetAllDigitalResources(
+    pageSize,
+    currentPage,
+    setTotalSize,
+    typeSelect,
+    categorySelect
   );
-  console.log(tags);
-  const [tagsSeleccionadas, setTagsSeleccionadas] = useState([]);
-  const mostrarTodo =
-    tagsSeleccionadas.length === 0 || tagsSeleccionadas.length === tags.length;
-  const TAGS = console.log("Tags seleccionadas:", tagsSeleccionadas);
+
   return (
     <div className="p-6 h-full w-full max-w-7xl m-auto">
-      <div className="sm:text-left text-center mt-3">
+      <div className="sm:text-left text-center my-3">
         <h1 className="text-blue-950 text-3xl font-bold sm:text-4xl!">
           Biblioteca 📘
         </h1>
@@ -28,23 +45,74 @@ export default function Biblioteca() {
           por profesionales para tu bienestar emocional
         </p>
       </div>
-      <Buscador onBuscar={setBusqueda} />
-      <FiltradorTags tags={tags} onFiltrar={setTagsSeleccionadas} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-10 rounded-3xl my-5">
-        {digitalResources
-          .filter(
-            (r) =>
-              (tagsSeleccionadas.length === 0
-                ? true
-                : tagsSeleccionadas.includes(r.category)) &&
-              (r.title.toLowerCase().includes(busqueda.toLowerCase()) ||
-                r.description.toLowerCase().includes(busqueda.toLowerCase()) ||
-                busqueda === "")
-          )
-          .map((digitalResource) => (
-            <RecursoBox recurso={digitalResource} />
-          ))}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label
+            htmlFor="categorySelect"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Categoría
+          </label>
+          <select
+            id="categorySelect"
+            value={categorySelect}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setCategorySelect(newValue);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value={""}>-- Selecciona --</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat.value} value={cat.index}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="typeSelect"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Tipo
+          </label>
+          <select
+            id="typeSelect"
+            value={typeSelect}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setTypeSelect(newValue);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value={""}>-- Selecciona --</option>
+            {TYPES.map((type) => (
+              <option key={type.value} value={type.index}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-10 rounded-3xl my-5">
+        {digitalResources.map((digitalResource) => (
+          <RecursoBox recurso={digitalResource} />
+        ))}
+      </div>
+      <PaginationBar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalSize}
+        setPageSize={setPageSize}
+        pageSize={pageSize}
+      />
     </div>
   );
 }
