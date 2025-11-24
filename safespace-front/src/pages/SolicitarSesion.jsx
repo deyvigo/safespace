@@ -4,6 +4,10 @@ import { useCreateSession } from "../hooks/Session/useCreateSession";
 import useGetMySessions from "../hooks/Session/useGetMySessions";
 import useGetPsychologist from "../hooks/Session/userGetPsichologist";
 import useGetSessionById from "../hooks/Session/useGetSessionById";
+import dayjs from "dayjs";
+import "dayjs/locale/es"
+dayjs.locale("es")
+
 const formatDateTime = (isoString) => {
   if (!isoString) return "Sin fecha";
   const date = new Date(isoString);
@@ -209,7 +213,7 @@ export default function SolicitarSesion() {
 
     const payload = {
       type: tipo === "virtual" ? "ONLINE" : "PRESENTIAL",
-      session_date_time: start ? new Date(start).toISOString() : null,
+      session_date_time: start,
       student_reason: motivo || "",
       duration_minutes: duration_minutes,
       ...(user &&
