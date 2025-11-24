@@ -91,7 +91,7 @@ public class DailyRateServiceImpl implements DailyRateService {
 
     @Override
     public void checkAndSendAlertIfNeeded(StudentEntity student, LocalDateTime date) {
-        LocalDateTime start = date.toLocalDate().minusDays(3).atStartOfDay();
+        LocalDateTime start = date.toLocalDate().minusDays(2).atStartOfDay();
         LocalDateTime end = date.toLocalDate().plusDays(1).atStartOfDay();
         List<DailyRateEntity> lastRates = dailyRateRepository.findAllByCreatedAtBetweenAndStudent_Id(start, end, student.getId());
 

@@ -3,10 +3,13 @@ package com.example.safespace_back;
 import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
 import com.example.safespace_back.dto.in.RegisterPsychologistRequestDTO;
 import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
+import com.example.safespace_back.dto.in.SessionRequestDTO;
+import com.example.safespace_back.dto.in.SessionUpdateDTO;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
 import com.example.safespace_back.service.DailyMoodService;
+import com.example.safespace_back.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,8 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -30,6 +34,8 @@ public class DataInitializer implements CommandLineRunner {
     private final DailyMoodService dailyMoodService;
     private final DigitalResourcesRepository digitalResourcesRepository;
     private final SentenceRepository sentenceRepository;
+    private final SessionService sessionService;
+    private final SessionRepository sessionRepository;
 
     @Override
     @Transactional
@@ -88,6 +94,17 @@ public class DataInitializer implements CommandLineRunner {
                     "Psicólogo Educativo"
                 )
             );
+            authService.registerPsychologist(
+                new RegisterPsychologistRequestDTO(
+                    "mindpath",
+                    "123456",
+                    "Ricardo",
+                    "Salazar",
+                    LocalDate.parse("1990-11-02"),
+                    "Universidad de Lima",
+                    "Psicólogo Clínico"
+                )
+            );
 
             authService.registerStudent(
                 new RegisterStudentRequestDTO(
@@ -121,6 +138,97 @@ public class DataInitializer implements CommandLineRunner {
                 )
             );
         }
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "mariaperez",
+                "123456",
+                "María",
+                "Pérez",
+                LocalDate.parse("2002-04-12"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "anatorres",
+                "123456",
+                "Ana",
+                "Torres",
+                LocalDate.parse("2003-01-20"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "luisherrera",
+                "123456",
+                "Luis",
+                "Herrera",
+                LocalDate.parse("1999-07-18"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "sofiaramirez",
+                "123456",
+                "Sofía",
+                "Ramírez",
+                LocalDate.parse("2001-12-03"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "andresvega",
+                "123456",
+                "Andrés",
+                "Vega",
+                LocalDate.parse("2002-10-08"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "valeriadiaz",
+                "123456",
+                "Valeria",
+                "Díaz",
+                LocalDate.parse("2001-01-27"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "sebastiancastro",
+                "123456",
+                "Sebastián",
+                "Castro",
+                LocalDate.parse("2000-05-19"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "paulagonzales",
+                "123456",
+                "Paula",
+                "Gonzales",
+                LocalDate.parse("1999-12-25"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+        authService.registerStudent(
+            new RegisterStudentRequestDTO(
+                "robertosilva",
+                "123456",
+                "Roberto",
+                "Silva",
+                LocalDate.parse("2003-02-11"),
+                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+            )
+        );
+
 
         if (moodRepository.findAll().isEmpty()) {
             moodRepository.saveAll(List.of(
@@ -308,5 +416,45 @@ public class DataInitializer implements CommandLineRunner {
             ));
         }
 
+        if (sessionRepository.findAll().isEmpty()) {
+            createRandomSessions(students);
+            updateStatusCompletedSessions(psychologists);
+        }
+
+        System.out.println("Data inicializada");
+    }
+
+    private void createRandomSessions(List<StudentEntity> students) {
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(5);
+
+        List<LocalDateTime> allSlots = new ArrayList<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalTime dayStart = LocalTime.of(8, 0);
+            LocalTime dayEnd = LocalTime.of(18, 0);
+            while (!dayStart.plusMinutes(60).isAfter(dayEnd)) {
+                allSlots.add(LocalDateTime.of(date, dayStart));
+                dayStart = dayStart.plusMinutes(60);
+            }
+        }
+
+        for (LocalDateTime d : allSlots) {
+            SessionType sessionType = SessionType.values()[ThreadLocalRandom.current().nextInt(SessionType.values().length)];
+            sessionService.createSession(
+                new SessionRequestDTO(
+                    sessionType, d, "Necesito conversar", 60
+                ), students.get(ThreadLocalRandom.current().nextInt(students.size()))
+            );
+        }
+    }
+
+    private void updateStatusCompletedSessions(List<PsychologistEntity> psychologistEntities) {
+      List<SessionEntity> sessions = sessionRepository.findAll();
+          
+      sessions.stream()
+          .forEach(session -> {
+              session.setStatus(SessionStatus.COMPLETED);
+              sessionRepository.save(session);
+          });
     }
 }
