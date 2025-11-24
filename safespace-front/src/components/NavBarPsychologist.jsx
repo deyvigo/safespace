@@ -44,8 +44,8 @@ export default function NavBarStudent() {
 
   return (
     <nav className="bg-blue-600 text-white fixed top-0 left-0 z-50 shadow-md p-4 flex justify-between items-center w-full">
-      <Link 
-        to="/psicologo/dashboard" 
+      <Link
+        to="/psicologo/dashboard"
         className="flex items-center gap-2 font-bold text-lg text-white hover:text-blue-200"
       >
         <svg
@@ -53,7 +53,7 @@ export default function NavBarStudent() {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          style={{ color: 'white' }}
+          style={{ color: "white" }}
         >
           <path
             strokeLinecap="round"
@@ -66,7 +66,7 @@ export default function NavBarStudent() {
           className="w-5 h-5 text-white"
           fill="currentColor"
           viewBox="0 0 24 24"
-          style={{ color: 'white' }}
+          style={{ color: "white" }}
         >
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
         </svg>
@@ -76,19 +76,21 @@ export default function NavBarStudent() {
         <Link
           to="/psicologo/dashboard"
           className={`text-white hover:text-blue-200 transition-colors ${
-            location.pathname === "/psicologo/dashboard" ? "font-semibold underline" : ""
+            location.pathname === "/psicologo/dashboard"
+              ? "font-semibold underline"
+              : ""
           }`}
         >
           Dashboard
         </Link>
-        <Link
+        {/* <Link
           to="/estudiantes"
           className={`text-white hover:text-blue-200 transition-colors ${
             location.pathname === "/estudiantes" ? "font-semibold underline" : ""
           }`}
         >
           Estudiantes
-        </Link>
+        </Link> */}
         <Link
           to="/sesiones"
           className={`text-white hover:text-blue-200 transition-colors ${
@@ -100,7 +102,9 @@ export default function NavBarStudent() {
         <Link
           to="/mensajes-ia"
           className={`text-white hover:text-blue-200 transition-colors ${
-            location.pathname === "/mensajes-ia" ? "font-semibold underline" : ""
+            location.pathname === "/mensajes-ia"
+              ? "font-semibold underline"
+              : ""
           }`}
         >
           Mensajes IA
@@ -108,7 +112,9 @@ export default function NavBarStudent() {
         <Link
           to="/gestion-contenidos"
           className={`text-white hover:text-blue-200 transition-colors ${
-            location.pathname === "/gestion-contenidos" ? "font-semibold underline" : ""
+            location.pathname === "/gestion-contenidos"
+              ? "font-semibold underline"
+              : ""
           }`}
         >
           Contenidos

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -76,9 +76,11 @@ export default function Sesiones() {
     });
   }, [appointments]);
 
-  const confirmedAppointmentsForCalendar = useMemo(() => {
+  const appointmentsForCalendar = useMemo(() => {
     if (!appointments) return [];
-    return appointments.filter((appt) => appt.status === "CONFIRMED");
+    return appointments.filter(
+      (appt) => appt.status === "CONFIRMED" || appt.status === "COMPLETED"
+    );
   }, [appointments]);
 
   const completedAppointments = useMemo(() => {
@@ -99,12 +101,25 @@ export default function Sesiones() {
     setEventos(actualizados);
   };
 
+  const handleSessionUpdate = useCallback(() => {
+    // Refresca ambas listas de datos
+    refresh(); // de useGetMyAppointments
+    refreshPendingSessions(); // de useGetPendingSessions
+  }, [refresh, refreshPendingSessions]);
+
   useEffect(() => {
-    if (confirmedAppointmentsForCalendar.length > 0) {
-      const mapped = mapAppointmentsToEvents(confirmedAppointmentsForCalendar);
+    // Vuelve a cargar las sesiones pendientes cada vez que se selecciona la pestaña
+    if (filtroActivo === "Pendientes") {
+      refreshPendingSessions();
+    }
+  }, [filtroActivo, refreshPendingSessions]);
+
+  useEffect(() => {
+    if (appointmentsForCalendar.length > 0) {
+      const mapped = mapAppointmentsToEvents(appointmentsForCalendar);
       setEventos(mapped);
     }
-  }, [confirmedAppointmentsForCalendar]);
+  }, [appointmentsForCalendar]);
 
   const botones = ["Hoy", "Cronograma", "Pendientes", "Historial"];
 
@@ -158,7 +173,11 @@ export default function Sesiones() {
                   onSessionUpdate={refresh}
                 />
               ))
-            : !apptLoading && <p>No tienes citas confirmadas para hoy.</p>}
+            : !apptLoading && (
+                <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
+                  <p className="text-gray-500">No tienes citas confirmadas para hoy.</p>
+                </div>
+              )}
         </div>
       )}
 
@@ -172,7 +191,11 @@ export default function Sesiones() {
             ? completedAppointments.map((sesion) => (
                 <SesionHistorialBox key={sesion.id} sesion={sesion} />
               ))
-            : !apptLoading && <p>No tienes citas en tu historial.</p>}
+            : !apptLoading && (
+                <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
+                  <p className="text-gray-500">No tienes citas en tu historial.</p>
+                </div>
+              )}
         </div>
       )}
 
@@ -189,10 +212,14 @@ export default function Sesiones() {
                 <SesionPendiente
                   key={sesion.id}
                   sesion={sesion}
-                  onSessionUpdate={refreshPendingSessions}
+                  onSessionUpdate={handleSessionUpdate}
                 />
               ))
-            : !pendingLoading && <p>No tienes sesiones pendientes.</p>}
+            : !pendingLoading && (
+                <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
+                  <p className="text-gray-500">No tienes sesiones pendientes.</p>
+                </div>
+              )}
         </div>
       )}
 
