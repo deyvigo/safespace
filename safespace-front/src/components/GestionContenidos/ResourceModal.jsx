@@ -1,5 +1,5 @@
 import { CATEGORIES, TYPES } from "../../constants/digitalResources";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect } from "react";
 
 const convertImageToWebP = (file) => {
@@ -319,7 +319,7 @@ export default function ResourceModal({
                       onClick={() => removeImage(index)}
                       className="absolute top-1 left-1 bg-blue-500 text-white hover:cursor-pointer! rounded-full w-6 h-6 flex items-center justify-center"
                     >
-                      <X size={16} strokeWidth={3} />
+                      X
                     </button>
                   </div>
                 ))}
