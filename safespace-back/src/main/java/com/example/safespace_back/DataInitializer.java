@@ -137,97 +137,98 @@ public class DataInitializer implements CommandLineRunner {
                     faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
                 )
             );
+            
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "mariaperez",
+                    "123456",
+                    "María",
+                    "Pérez",
+                    LocalDate.parse("2002-04-12"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "anatorres",
+                    "123456",
+                    "Ana",
+                    "Torres",
+                    LocalDate.parse("2003-01-20"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "luisherrera",
+                    "123456",
+                    "Luis",
+                    "Herrera",
+                    LocalDate.parse("1999-07-18"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "sofiaramirez",
+                    "123456",
+                    "Sofía",
+                    "Ramírez",
+                    LocalDate.parse("2001-12-03"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "andresvega",
+                    "123456",
+                    "Andrés",
+                    "Vega",
+                    LocalDate.parse("2002-10-08"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "valeriadiaz",
+                    "123456",
+                    "Valeria",
+                    "Díaz",
+                    LocalDate.parse("2001-01-27"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "sebastiancastro",
+                    "123456",
+                    "Sebastián",
+                    "Castro",
+                    LocalDate.parse("2000-05-19"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "paulagonzales",
+                    "123456",
+                    "Paula",
+                    "Gonzales",
+                    LocalDate.parse("1999-12-25"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
+            authService.registerStudent(
+                new RegisterStudentRequestDTO(
+                    "robertosilva",
+                    "123456",
+                    "Roberto",
+                    "Silva",
+                    LocalDate.parse("2003-02-11"),
+                    faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
+                )
+            );
         }
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "mariaperez",
-                "123456",
-                "María",
-                "Pérez",
-                LocalDate.parse("2002-04-12"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "anatorres",
-                "123456",
-                "Ana",
-                "Torres",
-                LocalDate.parse("2003-01-20"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "luisherrera",
-                "123456",
-                "Luis",
-                "Herrera",
-                LocalDate.parse("1999-07-18"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "sofiaramirez",
-                "123456",
-                "Sofía",
-                "Ramírez",
-                LocalDate.parse("2001-12-03"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "andresvega",
-                "123456",
-                "Andrés",
-                "Vega",
-                LocalDate.parse("2002-10-08"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "valeriadiaz",
-                "123456",
-                "Valeria",
-                "Díaz",
-                LocalDate.parse("2001-01-27"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "sebastiancastro",
-                "123456",
-                "Sebastián",
-                "Castro",
-                LocalDate.parse("2000-05-19"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "paulagonzales",
-                "123456",
-                "Paula",
-                "Gonzales",
-                LocalDate.parse("1999-12-25"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
-        authService.registerStudent(
-            new RegisterStudentRequestDTO(
-                "robertosilva",
-                "123456",
-                "Roberto",
-                "Silva",
-                LocalDate.parse("2003-02-11"),
-                faculties.get(ThreadLocalRandom.current().nextInt(faculties.size())).getId()
-            )
-        );
 
 
         if (moodRepository.findAll().isEmpty()) {
