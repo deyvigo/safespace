@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useCreateSession } from "../hooks/Session/useCreateSession";
 import useGetMySessions from "../hooks/Session/useGetMySessions";
 import useGetPsychologist from "../hooks/Session/userGetPsichologist";
+import useGetSessionById from "../hooks/Session/useGetSessionById";
 
 // --- Funciones auxiliares (Sin cambios) ---
 const formatDateTime = (isoString) => {
@@ -159,6 +160,48 @@ function PsychologistProfileCard() {
       </div>
          {" "}
     </div>
+  );
+}
+
+function JoinSessionButton({ sessionId }) {
+  const { fetchSession, loading } = useGetSessionById();
+
+  const handleJoin = async () => {
+    try {
+      const sessionDetails = await fetchSession(sessionId);
+      if (sessionDetails && sessionDetails.link) {
+        window.open(sessionDetails.link, "_blank", "noopener,noreferrer");
+      } else {
+        alert("No se encontró un link para esta sesión.");
+      }
+    } catch (error) {
+      console.error("Error fetching session link:", error);
+      alert("Hubo un error al obtener el link de la sesión.");
+    }
+  };
+
+  return (
+    <button
+      onClick={handleJoin}
+      disabled={loading}
+      className="bg-white border border-cyan-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm hover:bg-cyan-50 flex items-center gap-2 disabled:bg-gray-200 disabled:cursor-not-allowed"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h.01M4 12h.01M4 18h.01"
+        />
+      </svg>
+      <span className="text-sm font-medium">{loading ? "Cargando..." : "Unirse"}</span>
+    </button>
   );
 }
 // ----------------------------------------------------
@@ -326,32 +369,9 @@ export default function SolicitarSesion() {
                       </div>
                                            {" "}
                       <div className="flex flex-col items-end gap-3">
-                                               {" "}
-                        {s.type === "ONLINE" && (
-                          <button className="bg-white border border-cyan-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm hover:bg-cyan-50 flex items-center gap-2">
-                                                       {" "}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                            >
-                                                           {" "}
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h.01M4 12h.01M4 18h.01"
-                              />
-                                                         {" "}
-                            </svg>
-                                                       {" "}
-                            <span className="text-sm font-medium">Unirse</span> 
-                                                   {" "}
-                          </button>
+                        {s.type === "ONLINE" && s.status === "CONFIRMED" && (
+                          <JoinSessionButton sessionId={s.id} />
                         )}
-                                             {" "}
                       </div>
                                          {" "}
                     </div>
