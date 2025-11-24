@@ -17,6 +17,7 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
     message: "",
   });
   const [cancelReason, setCancelReason] = useState("");
+  const [sessionLink, setSessionLink] = useState("");
 
   const [nuevaFecha, setNuevaFecha] = useState(
     sesion.session_date_time ? new Date(sesion.session_date_time) : null
@@ -57,12 +58,18 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
 
   const closeModal = () => {
     setModalState({ isOpen: false, mode: null, title: "", message: "" });
+    setSessionLink("");
     setCancelReason("");
   };
 
   const handleAceptarCita = async () => {
+    const payload = { status: "CONFIRMED" };
+    if (sesion.type === "ONLINE") {
+      payload.link = sessionLink;
+    }
+
     try {
-      await updateStatus(sesion.id, { status: "CONFIRMED" });
+      await updateStatus(sesion.id, payload);
       setModalState({
         isOpen: true,
         mode: "success",
@@ -107,12 +114,21 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
   };
 
   const openAcceptModal = () => {
-    setModalState({
-      isOpen: true,
-      mode: "accept",
-      title: "Confirmar Cita",
-      message: "¿Estás seguro de que deseas aceptar esta cita?",
-    });
+    if (sesion.type === "ONLINE") {
+      setModalState({
+        isOpen: true,
+        mode: "accept-virtual",
+        title: "Confirmar Cita Virtual",
+        message: "Por favor, ingresa el link para la sesión:",
+      });
+    } else {
+      setModalState({
+        isOpen: true,
+        mode: "accept",
+        title: "Confirmar Cita",
+        message: "¿Estás seguro de que deseas aceptar esta cita?",
+      });
+    }
   };
 
   const openCancelModal = () => {
@@ -282,7 +298,8 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
         isOpen={modalState.isOpen}
         onClose={closeModal}
         onConfirm={
-          modalState.mode === "accept"
+          modalState.mode === "accept" ||
+          modalState.mode === "accept-virtual"
             ? handleAceptarCita
             : modalState.mode === "cancel"
             ? handleCancelarCita
@@ -290,7 +307,7 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
         }
         title={modalState.title}
         confirmText={
-          modalState.mode === "accept"
+          modalState.mode === "accept" || modalState.mode === "accept-virtual"
             ? "Aceptar"
             : modalState.mode === "cancel"
             ? "Confirmar Cancelación"
@@ -302,10 +319,13 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
             : "bg-blue-600 hover:bg-blue-700"
         }
         showCancelButton={
-          modalState.mode === "accept" || modalState.mode === "cancel"
+          modalState.mode === "accept" ||
+          modalState.mode === "cancel" ||
+          modalState.mode === "accept-virtual"
         }
         isConfirmDisabled={
           (modalState.mode === "cancel" && !cancelReason) ||
+          (modalState.mode === "accept-virtual" && !sessionLink) ||
           isAccepting ||
           isCancelling
         }
@@ -317,6 +337,15 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
             onChange={(e) => setCancelReason(e.target.value)}
             placeholder="Motivo..."
             className="w-full h-24 border-1 border-gray-300 rounded-xl text-left align-top p-2 mt-2"
+          />
+        )}
+        {modalState.mode === "accept-virtual" && (
+          <input
+            type="text"
+            value={sessionLink}
+            onChange={(e) => setSessionLink(e.target.value)}
+            placeholder="https://meet.google.com/..."
+            className="w-full border border-gray-300 rounded-xl p-2 mt-2"
           />
         )}
         {(isAccepting || isCancelling) && (

@@ -138,7 +138,10 @@ export default function NavBarStudent() {
         >
           Dashboard
         </Link>
-        <Link to="/chat" className="hover:text-indigo-200 transition-colors">
+        <Link
+          to="/chat"
+          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
+        >
           Chat
         </Link>
         {token ? (
