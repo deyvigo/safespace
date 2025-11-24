@@ -1,4 +1,6 @@
-export const AlertItem = ({ message, student_name, avg_rate }) => {
+import { formatDateWithTime } from "../../../utils/dateFormat"
+
+export const AlertItem = ({ message, student_name, avg_rate, created_at }) => {
   const getStatusInfo = (rate) => {
     if (rate >= 7) {
       return {
@@ -31,7 +33,7 @@ export const AlertItem = ({ message, student_name, avg_rate }) => {
   return (
     <div className={`flex items-center justify-between p-4 rounded-lg border ${bg} ${border}`}>
       <div className="flex-1">
-        <p className="font-semibold text-gray-800">{student_name}</p>
+        <p className="font-semibold text-gray-800">{student_name} <span className="italic font-light text-xs">{formatDateWithTime(created_at)}</span> </p>
         <p className="text-sm text-gray-600">{message}</p>
       </div>
 
