@@ -4,6 +4,7 @@ import com.example.safespace_back.dto.in.DailyMoodRequestDTO;
 import com.example.safespace_back.dto.in.RegisterPsychologistRequestDTO;
 import com.example.safespace_back.dto.in.RegisterStudentRequestDTO;
 import com.example.safespace_back.dto.in.SessionRequestDTO;
+import com.example.safespace_back.dto.in.SessionUpdateDTO;
 import com.example.safespace_back.model.*;
 import com.example.safespace_back.repository.*;
 import com.example.safespace_back.service.AuthService;
@@ -417,6 +418,7 @@ public class DataInitializer implements CommandLineRunner {
 
         if (sessionRepository.findAll().isEmpty()) {
             createRandomSessions(students);
+            updateStatusCompletedSessions(psychologists);
         }
 
         System.out.println("Data inicializada");
@@ -444,5 +446,15 @@ public class DataInitializer implements CommandLineRunner {
                 ), students.get(ThreadLocalRandom.current().nextInt(students.size()))
             );
         }
+    }
+
+    private void updateStatusCompletedSessions(List<PsychologistEntity> psychologistEntities) {
+      List<SessionEntity> sessions = sessionRepository.findAll();
+          
+      sessions.stream()
+          .forEach(session -> {
+              session.setStatus(SessionStatus.COMPLETED);
+              sessionRepository.save(session);
+          });
     }
 }
