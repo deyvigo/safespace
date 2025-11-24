@@ -21,20 +21,29 @@ export const AlertBox = () => {
   }, [])
 
   useEffect(() => {
+    if (!user || !token) return;
+
     const client = connectStomp(user.username, token, 'notifications', (data) => {
       // console.log(data) // para ver el formato de las notificaciones que llegan
-      setNotifications((prev) => [data, ...prev])
+      // search in notifcation by student_username and put it in the init of the array
+      setNotifications((prev) => {
+        const targetNotificaiont = prev.find((notif) => notif.student_username === data.student_username)
+        if (targetNotificaiont) {
+          prev.splice(prev.indexOf(targetNotificaiont), 1)
+        }
+        return [data, ...prev]
+      })
     })
 
     return () => {
       client?.deactivate?.()
     }
-  }, [])
+  }, [user, token])
 
   return (
-    <div className="space-y-4 overflow-x-auto">
+    <div className="space-y-4 overflow-y-auto">
       {
-        notifications.map(({ message, student_name, student_last_name, avg_rate }, idx) => <AlertItem key={idx} message={message} student_name={`${student_name} ${student_last_name}`} avg_rate={avg_rate} />)
+        notifications.map(({ message, student_name, student_last_name, avg_rate, created_at }, idx) => <AlertItem key={idx} message={message} student_name={`${student_name} ${student_last_name}`} avg_rate={avg_rate} created_at={created_at} />)
       }
     </div>
   )

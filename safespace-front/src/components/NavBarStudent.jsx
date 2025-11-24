@@ -13,7 +13,7 @@ export default function NavBarStudent() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 640) {
-        setDropActive(false); 
+        setDropActive(false);
       }
     };
     handleResize();
@@ -39,8 +39,8 @@ export default function NavBarStudent() {
   };
 
   const handleHamburguerClick = () => {
-    setDropActive((curr) => !curr)
-  }
+    setDropActive((curr) => !curr);
+  };
 
   return (
     <nav
@@ -64,6 +64,12 @@ export default function NavBarStudent() {
             className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
           >
             Biblioteca
+          </Link>
+          <Link
+            to="/solicitar-sesion"
+            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
+          >
+            Solicitar sesión
           </Link>
           <Link
             to="dashboard"
@@ -121,6 +127,12 @@ export default function NavBarStudent() {
           Biblioteca
         </Link>
         <Link
+          to="/solicitar-sesion"
+          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
+        >
+          Solicitar sesión
+        </Link>
+        <Link
           to="/dashboard"
           className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
         >
@@ -145,4 +157,3 @@ export default function NavBarStudent() {
     </nav>
   );
 }
-

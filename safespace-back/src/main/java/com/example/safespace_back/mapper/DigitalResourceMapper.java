@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DigitalResourceMapper {
     @Mapping(target = "id_psychologist", source = "psychologist.id")

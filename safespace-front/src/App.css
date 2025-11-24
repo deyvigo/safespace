@@ -18,3 +18,8 @@ nav.bg-blue-600 a:hover {
 nav.bg-blue-600 button {
   color: white !important;
 }
+
+.fc .fc-timegrid-slot-label {
+  color: #1f2937; /* Tailwind gray-800 o cualquier color oscuro */
+  font-weight: 500;
+}
