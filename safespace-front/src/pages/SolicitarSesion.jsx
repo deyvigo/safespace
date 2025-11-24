@@ -3,8 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useCreateSession } from "../hooks/Session/useCreateSession";
 import useGetMySessions from "../hooks/Session/useGetMySessions";
 import useGetPsychologist from "../hooks/Session/userGetPsichologist";
-
-// --- Funciones auxiliares (Sin cambios) ---
+import useGetSessionById from "../hooks/Session/useGetSessionById";
 const formatDateTime = (isoString) => {
   if (!isoString) return "Sin fecha";
   const date = new Date(isoString);
@@ -67,13 +66,8 @@ const getStatusStyles = (status) => {
       };
   }
 };
-// --- Fin funciones auxiliares ---
-
-// ----------------------------------------------------
-// 2. 👩‍⚕️ Componente interno para el perfil del psicólogo (MODIFICADO)
-// ----------------------------------------------------
 function PsychologistProfileCard() {
-  const { psychologist, loading, error } = useGetPsychologist(); // Icono genérico de perfil
+  const { psychologist, loading, error } = useGetPsychologist();
 
   const ProfileIcon = (
     <svg
@@ -86,15 +80,15 @@ function PsychologistProfileCard() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />   {" "}
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
     </svg>
   );
 
   if (loading) {
     return (
       <div className="p-4 bg-white rounded-lg shadow-lg border border-slate-200">
-                <p className="text-slate-600">Cargando perfil...</p>     {" "}
+        <p className="text-slate-600">Cargando perfil...</p>
       </div>
     );
   }
@@ -102,14 +96,12 @@ function PsychologistProfileCard() {
   if (error || !psychologist) {
     return (
       <div className="p-4 bg-red-50 rounded-lg shadow-lg border border-red-200">
-               {" "}
         <p className="text-red-600">
           No hay un psicólogo asignado o error de carga.
         </p>
-             {" "}
       </div>
     );
-  } // 🔑 Mapeo directo a las propiedades del backend
+  }
 
   const fullName = `${psychologist.name || ""} ${
     psychologist.last_name || ""
@@ -120,50 +112,77 @@ function PsychologistProfileCard() {
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-lg border border-slate-200 h-fit sticky top-6">
-           {" "}
       <h3 className="text-2xl font-bold mb-4 text-center text-slate-800">
-                Tu Profesional      {" "}
+        Tu Profesional
       </h3>
-            {ProfileIcon}     {" "}
+      {ProfileIcon}
       <div className="text-center mb-5">
-               {" "}
-        <p className="text-xl font-semibold text-cyan-700">{fullName}</p>       {" "}
+        <p className="text-xl font-semibold text-cyan-700">{fullName}</p>
         <p className="text-slate-600 text-sm italic mt-1">
           {psychologist.username}
         </p>
-             {" "}
       </div>
-                 {" "}
       <div className="pt-4 border-t border-slate-200 text-sm space-y-2">
-               {" "}
         <p className="text-slate-700">
-                    💼 <span className="font-medium ml-2">Profesión:</span>{" "}
-          {psychologist.profession || "N/A"}       {" "}
+          💼 <span className="font-medium ml-2">Profesión:</span>{" "}
+          {psychologist.profession || "N/A"}
         </p>
-               {" "}
         <p className="text-slate-700">
-                    🎓 <span className="font-medium ml-2">Universidad:</span>{" "}
-          {psychologist.university || "N/A"}       {" "}
+          🎓 <span className="font-medium ml-2">Universidad:</span>{" "}
+          {psychologist.university || "N/A"}
         </p>
-               {" "}
         <p className="text-slate-700">
-                    🎂 <span className="font-medium ml-2">Nacimiento:</span>{" "}
-          {formattedBirthday}       {" "}
+          🎂 <span className="font-medium ml-2">Nacimiento:</span> {formattedBirthday}
         </p>
-               {" "}
         <p className="text-slate-700">
-                    📞 <span className="font-medium ml-2">Contacto:</span> Vía
-          chat interno        {" "}
+          📞 <span className="font-medium ml-2">Contacto:</span> Vía chat interno
         </p>
-             {" "}
       </div>
-         {" "}
     </div>
   );
 }
-// ----------------------------------------------------
-// ----------------------------------------------------
 
+function JoinSessionButton({ sessionId }) {
+  const { fetchSession, loading } = useGetSessionById();
+
+  const handleJoin = async () => {
+    try {
+      const sessionDetails = await fetchSession(sessionId);
+      if (sessionDetails && sessionDetails.link) {
+        window.open(sessionDetails.link, "_blank", "noopener,noreferrer");
+      } else {
+        alert("No se encontró un link para esta sesión.");
+      }
+    } catch (error) {
+      console.error("Error fetching session link:", error);
+      alert("Hubo un error al obtener el link de la sesión.");
+    }
+  };
+
+  return (
+    <button
+      onClick={handleJoin}
+      disabled={loading}
+      className="bg-white border border-cyan-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm hover:bg-cyan-50 flex items-center gap-2 disabled:bg-gray-200 disabled:cursor-not-allowed"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h.01M4 12h.01M4 18h.01"
+        />
+      </svg>
+      <span className="text-sm font-medium">{loading ? "Cargando..." : "Unirse"}</span>
+    </button>
+  );
+}
 export default function SolicitarSesion() {
   const { token, user } = useContext(AuthContext);
   const {
@@ -219,51 +238,35 @@ export default function SolicitarSesion() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen text-slate-800">
-                   {" "}
       <div className="flex justify-between items-start mb-6">
-               {" "}
         <div>
-                   {" "}
           <h1 className="text-3xl font-bold mb-1 text-slate-800">
             Dashboard de Bienestar
           </h1>
-                   {" "}
           <p className="text-slate-600">
             Revisa tus citas y tu profesional asignado.
           </p>
-                 {" "}
         </div>
-               {" "}
         <div>
-                   {" "}
           <button
             onClick={() => setModalOpen(true)}
             className="bg-white border border-cyan-200 text-cyan-700 px-4 py-2 rounded-lg shadow-sm hover:bg-cyan-50"
           >
-                        Agendar nueva          {" "}
+            Agendar nueva
           </button>
-                 {" "}
         </div>
-             {" "}
       </div>
-            {/* NUEVA ESTRUCTURA DE DOS COLUMNAS */}     {" "}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-               {" "}
-        {/* Columna 1: LISTADO DE SESIONES (Ocupa 3/4 del ancho en LG) */}     
-         {" "}
         <div className="lg:col-span-3">
-                   {" "}
           <h2 className="text-2xl font-semibold mb-4 text-slate-800">
             Próximas sesiones
           </h2>
-                   {" "}
           {loadingSessions ? (
             <p className="text-slate-600">Cargando sesiones...</p>
           ) : sessionsError ? (
             <p className="text-red-600">Error cargando sesiones</p>
           ) : sessions && sessions.length > 0 ? (
             <div className="space-y-4">
-                           {" "}
               {sessions.map((s) => {
                 // Extracción y mapeo de datos del backend
                 const dateTime = s.session_date_time;
@@ -281,118 +284,63 @@ export default function SolicitarSesion() {
                     key={s.id}
                     className={`rounded-2xl p-5 shadow-sm border ${statusStyles.card}`}
                   >
-                                       {" "}
                     <div className="flex justify-between items-start">
-                                           {" "}
                       <div>
-                                               {" "}
                         <div className="flex items-center gap-3 mb-2">
-                                                   {" "}
                           <span
                             className={`inline-block text-xs px-2 py-1 rounded-full font-semibold ${statusStyles.label}`}
                           >
-                                                        {statusLabel}           
-                                         {" "}
+                            {statusLabel}
                           </span>
-                                                   {" "}
                           <span className="text-slate-600 text-sm">
-                                                        {timeLabel}             
-                                       {" "}
+                            {timeLabel}
                           </span>
-                                                 {" "}
                         </div>
-                                               {" "}
                         <h3 className="text-lg font-semibold text-slate-800">
-                                                   {" "}
-                          {s.title || `Sesión ${typeLabel}`}                   
-                             {" "}
+                          {s.title || `Sesión ${typeLabel}`}
                         </h3>
-                                               {" "}
                         <div className="text-slate-600 mt-2">
-                                                   {" "}
                           <p className="text-sm">
-                                                       {" "}
-                            <span className="mr-2">👩‍⚕️</span>                   
-                                    {professionalName || "Profesional Asignado"}
-                                                     {" "}
+                            <span className="mr-2">👩‍⚕️</span>
+                            {professionalName || "Profesional Asignado"}
                           </p>
-                                                   {" "}
                           {durationLabel && (
                             <p className="text-sm mt-1">⏱ {durationLabel}</p>
                           )}
-                                                 {" "}
                         </div>
-                                             {" "}
                       </div>
-                                           {" "}
                       <div className="flex flex-col items-end gap-3">
-                                               {" "}
-                        {s.type === "ONLINE" && (
-                          <button className="bg-white border border-cyan-200 text-slate-700 px-3 py-2 rounded-lg shadow-sm hover:bg-cyan-50 flex items-center gap-2">
-                                                       {" "}
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                            >
-                                                           {" "}
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h.01M4 12h.01M4 18h.01"
-                              />
-                                                         {" "}
-                            </svg>
-                                                       {" "}
-                            <span className="text-sm font-medium">Unirse</span> 
-                                                   {" "}
-                          </button>
+                        {s.type === "ONLINE" && s.status === "CONFIRMED" && (
+                          <JoinSessionButton sessionId={s.id} />
                         )}
-                                             {" "}
                       </div>
-                                         {" "}
                     </div>
-                                     {" "}
                   </div>
                 );
               })}
-                         {" "}
             </div>
           ) : (
             <div className="bg-white p-6 rounded-lg border text-slate-600">
-                            No hay sesiones programadas.            {" "}
+              No hay sesiones programadas.
             </div>
           )}
-                 {" "}
         </div>
-               {" "}
-        {/* Columna 2: PERFIL DEL PSICÓLOGO (Ocupa 1/4 del ancho en LG) */}     
-         {" "}
         <div className="lg:col-span-1">
-                    <PsychologistProfileCard />       {" "}
+          <PsychologistProfileCard />
         </div>
-             {" "}
       </div>
-                  {/* Modal for new request (sin cambios) */}     {" "}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-                   {" "}
           <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-lg relative">
-                       {" "}
             <button
               onClick={() => setModalOpen(false)}
               className="absolute top-3 right-3 text-slate-600"
             >
-                            ✕            {" "}
+              ✕
             </button>
-                       {" "}
             <h2 className="text-xl font-semibold mb-3 text-slate-800">
-                            Nueva solicitud            {" "}
+              Nueva solicitud
             </h2>
-                       {" "}
             <form
               onSubmit={async (e) => {
                 const ok = await handleSubmit(e);
@@ -400,11 +348,9 @@ export default function SolicitarSesion() {
               }}
               className="flex flex-col gap-3"
             >
-                           {" "}
               <label className="text-sm font-medium text-slate-700">
-                                Inicio              {" "}
+                Inicio
               </label>
-                           {" "}
               <input
                 type="datetime-local"
                 value={start}
@@ -412,67 +358,49 @@ export default function SolicitarSesion() {
                 required
                 className="w-full border p-2 rounded text-slate-800 bg-white"
               />
-                            {/* Duración fija: 60 minutos (no mostrar campo) */}
-                           {" "}
               <label className="text-sm font-medium text-slate-700">Tipo</label>
-                           {" "}
               <select
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
                 className="w-full border p-2 rounded text-slate-800 bg-white"
               >
-                                <option value="presencial">Presencial</option> 
-                              <option value="virtual">Virtual</option>         
-                   {" "}
+                <option value="presencial">Presencial</option>
+                <option value="virtual">Virtual</option>
               </select>
-                           {" "}
               <label className="text-sm font-medium text-slate-700">
-                                Motivo / notas              {" "}
+                Motivo / notas
               </label>
-                           {" "}
               <textarea
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
                 className="w-full border p-2 rounded text-slate-800 bg-white"
               />
-                           {" "}
               {(localError || createError) && (
                 <p className="text-red-600">
-                                   {" "}
                   {(localError && localError.toString()) ||
                     "Error al solicitar la sesión"}
-                                 {" "}
                 </p>
               )}
-                           {" "}
               <div className="flex justify-end">
-                               {" "}
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
                   className="mr-2 bg-gray-200 px-4 py-2 rounded"
                 >
-                                    Cancelar                {" "}
+                  Cancelar
                 </button>
-                               {" "}
                 <button
                   type="submit"
                   disabled={creating}
                   className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded"
                 >
-                                   {" "}
-                  {creating ? "Enviando..." : "Solicitar sesión"}               {" "}
+                  {creating ? "Enviando..." : "Solicitar sesión"}
                 </button>
-                             {" "}
               </div>
-                         {" "}
             </form>
-                     {" "}
           </div>
-                 {" "}
         </div>
       )}
-         {" "}
     </div>
   );
 }
