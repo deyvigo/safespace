@@ -56,6 +56,18 @@ public class GlobalExceptionHandler {
         .body(ErrorResponse.of(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage()));
     }
 
+    @ExceptionHandler(ImagesExceedException.class)
+    public ResponseEntity<ErrorResponse> handleImagesExceedException(ImagesExceedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(HttpStatus.CONFLICT, "EXCEED_IMAGES", ex.getMessage()));
+    }
+
+    @ExceptionHandler(IncorrectFormatImageException.class)
+    public ResponseEntity<ErrorResponse> handleIncorrectFormatImageException(IncorrectFormatImageException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "INCORRECT_EXTENSION", ex.getMessage()));
+    }
+
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN)

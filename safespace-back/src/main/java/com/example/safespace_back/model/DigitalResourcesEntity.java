@@ -27,6 +27,8 @@ public class DigitalResourcesEntity {
     private TypeDigitalResource type;
     private String link;
 
+    private boolean published = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_psychologist")
     private PsychologistEntity psychologist;
@@ -34,6 +36,6 @@ public class DigitalResourcesEntity {
     @ManyToMany(mappedBy = "favoriteResources")
     private Set<UserEntity> favoritedBy = new HashSet<>();
 
-    @OneToMany(mappedBy = "resourceParent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "resourceParent", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageMetadataEntity> images = new ArrayList<>();
 }

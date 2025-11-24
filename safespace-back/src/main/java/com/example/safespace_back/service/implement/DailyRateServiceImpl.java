@@ -11,6 +11,7 @@ import com.example.safespace_back.repository.DailyRateRepository;
 import com.example.safespace_back.repository.NotificationRepository;
 import com.example.safespace_back.service.DailyRateService;
 import com.example.safespace_back.service.GeminiAiService;
+import com.example.safespace_back.service.NotificationService;
 import com.example.safespace_back.service.WebSocketService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,7 @@ public class DailyRateServiceImpl implements DailyRateService {
     private final NotificationMapper notificationMapper;
     private final WebSocketService webSocketService;
     private final DailyRateMapper dailyRateMapper;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -102,19 +104,17 @@ public class DailyRateServiceImpl implements DailyRateService {
 
         String message = "Lleva un promedio de " + roundedRate + " los útimos 3 días.";
 
-        NotificationEntity saved = notificationRepository.save(
-          NotificationEntity
-              .builder()
-              .state("no leido")
-              .content(message)
-              .psychologist(student.getPsychologist())
-              .AvgRate(roundedRate)
-              .createdAt(date)
-              .student(student)
-              .build()
-        );
+        NotificationEntity toSave = NotificationEntity
+            .builder()
+            .state("no leido")
+            .content(message)
+            .psychologist(student.getPsychologist())
+            .AvgRate(roundedRate)
+            .createdAt(date)
+            .student(student)
+            .build();
 
-        NotificationResponseDTO notificationResponseDTO = notificationMapper.fromEntitytoDTO(saved);
+        NotificationResponseDTO notificationResponseDTO = notificationService.saveNotification(toSave);
 
         webSocketService.sendNotification(notificationResponseDTO, student.getPsychologist());
     }
