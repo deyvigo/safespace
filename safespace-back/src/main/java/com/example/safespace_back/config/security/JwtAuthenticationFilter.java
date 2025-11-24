@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String token = getTokenFromRequest(req);
         if (token == null || token.trim().isEmpty()) {
-            sendUnauthorizedResponse(res, "Token not provided");
+            sendUnauthorizedResponse(res, "Token not provided 1");
             return;
         } else {
             try {
@@ -83,6 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getTokenFromRequest(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
+        System.out.println(bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

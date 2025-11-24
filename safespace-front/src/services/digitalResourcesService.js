@@ -16,12 +16,28 @@ const getBaseUrl = () => {
   return API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
 };
 
-export const getDigitalResources = async () => {
+export const getDigitalResources = async (
+  query,
+  pageSize,
+  currentPage,
+  type,
+  category
+) => {
+  const params = new URLSearchParams();
+
+  params.set("page", currentPage);
+  params.set("size", pageSize);
+
+  if (type !== null && type !== undefined) params.set("type", type);
+  if (category !== null && category !== undefined)
+    params.set("category", category);
+
   try {
     const response = await axios.get(
-      `${getBaseUrl()}digital-resources`,
+      `${getBaseUrl()}digital-resources${query}?${params.toString()}`,
       getAuthHeaders()
     );
+
     return response.data;
   } catch (error) {
     console.error("Error al obtener los recursos digitales:", error);
@@ -53,6 +69,34 @@ export const updateDigitalResource = async (id, resourceData) => {
     return response.data;
   } catch (error) {
     console.error("Error al actualizar recurso digital:", error);
+    throw error;
+  }
+};
+
+export const publishDigitalResource = async (id) => {
+  try {
+    await axios.put(
+      `${getBaseUrl()}digital-resources/publish/${id}`,
+      null,
+      getAuthHeaders()
+    );
+    return true;
+  } catch (error) {
+    console.error("Error al publicar recurso digital:", error);
+    throw error;
+  }
+}
+
+export const unpublishDigitalResource = async (id) => {
+  try {
+    await axios.put(
+      `${getBaseUrl()}digital-resources/unpublish/${id}`,
+      null,
+      getAuthHeaders()
+    );
+    return true;
+  } catch (error) {
+    console.error("Error al publicar recurso digital:", error);
     throw error;
   }
 };

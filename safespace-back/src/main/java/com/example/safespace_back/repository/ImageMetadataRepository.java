@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ImageMetadataRepository extends JpaRepository<ImageMetadataEntity,Long>{
     List<ImageMetadataEntity> findAllByResourceParent_Id(Long psychologistId);
+    void deleteByPublicID(String publicId);
 }

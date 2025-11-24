@@ -1,13 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import {
-  getDigitalResources,
   createDigitalResource,
   updateDigitalResource,
   deleteDigitalResource,
+  publishDigitalResource,
+  unpublishDigitalResource,
 } from "../services/digitalResourcesService";
 import ResourceCard from "../components/GestionContenidos/ResourceCard";
 import ResourceModal from "../components/GestionContenidos/ResourceModal";
 import FilterTabs from "../components/GestionContenidos/FilterTabs";
+import useGetAllDigitalResources from "../hooks/DigitalResources/useGetAllDigitalResources";
+import { AuthContext } from "../context/AuthContext";
+import PaginationBar from "../components/Pagination/PaginationBar";
+import usePaginationController from "../hooks/Pagination/usePaginationController";
+import { CATEGORIES, TYPES } from "../constants/digitalResources";
 
 const INITIAL_FORM_DATA = {
   title: "",
@@ -19,31 +25,31 @@ const INITIAL_FORM_DATA = {
 };
 
 export default function GestionContenidos() {
-  const [resources, setResources] = useState([]);
   const [filter, setFilter] = useState("todos");
-  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
-  const [error, setError] = useState("");
+  const [typeSelect, setTypeSelect] = useState("");
+  const [categorySelect, setCategorySelect] = useState("");
+  const {
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalSize,
+    setTotalSize,
+  } = usePaginationController();
+  const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    loadResources();
-  }, []);
-
-  const loadResources = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await getDigitalResources();
-      setResources(data?.map((el) => ({...el,images: el.images.map((sub) => [sub.public_url])})));
-    } catch (err) {
-      setError("Error al cargar los contenidos");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    digitalResources,
+    loading,
+    error,
+    setError,
+    opt,
+    setOpt,
+    fetchDigitalResources: refresh,
+  } = useGetAllDigitalResources(pageSize, currentPage, setTotalSize, typeSelect, categorySelect);
 
   const handleCreate = () => {
     setEditingResource(null);
@@ -60,10 +66,34 @@ export default function GestionContenidos() {
       category: resource.category || "BIENESTAR",
       type: resource.type || "ARTICLE",
       link: resource.link || "",
-      images: resource.images || []
+      images: resource.images || [],
     });
     setError("");
     setShowModal(true);
+  };
+
+  const handlePublish = async (id) => {
+    if (
+      window.confirm("¿Estás seguro de que deseas publicar este contenido?")
+    ) {
+      try {
+        await publishDigitalResource(id);
+        await refresh(opt);
+      } catch (err) {
+        setError("Error al publicar el contenido", err);
+      }
+    }
+  };
+
+  const handleUnpublish = async (id) => {
+    if (window.confirm("¿Estás seguro de que deseas ocultar este contenido?")) {
+      try {
+        await unpublishDigitalResource(id);
+        await refresh(opt);
+      } catch (err) {
+        setError("Error al ocultar el contenido", err);
+      }
+    }
   };
 
   const handleDelete = async (id) => {
@@ -72,9 +102,9 @@ export default function GestionContenidos() {
     ) {
       try {
         await deleteDigitalResource(id);
-        await loadResources();
+        await refresh(opt);
       } catch (err) {
-        setError("Error al eliminar el contenido");
+        setError("Error al eliminar el contenido", err);
       }
     }
   };
@@ -89,7 +119,7 @@ export default function GestionContenidos() {
         await createDigitalResource(formData);
       }
       handleCloseModal();
-      await loadResources();
+      await refresh(opt);
     } catch (err) {
       setError(err.response?.data?.message || "Error al guardar el contenido");
     }
@@ -102,14 +132,14 @@ export default function GestionContenidos() {
     setError("");
   };
 
-  const filteredResources = resources;
+  const filteredResources = digitalResources;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen max-w-7xl mx-auto bg-gray-50 p-6">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex justify-between items-start mb-2">
-          <div>
+      <div className="mb-6 mt-6 sm:mt-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-y-5">
+          <div className="text-center w-full sm:text-left">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">
               Gestión de Contenidos
             </h1>
@@ -140,7 +170,12 @@ export default function GestionContenidos() {
       </div>
 
       {/* Tabs */}
-      <FilterTabs activeFilter={filter} onFilterChange={setFilter} />
+      <FilterTabs
+        activeFilter={filter}
+        onFilterChange={setFilter}
+        setOpt={setOpt}
+        setCurrentPage={setCurrentPage}
+      />
 
       {/* Error Message */}
       {error && (
@@ -149,12 +184,64 @@ export default function GestionContenidos() {
         </div>
       )}
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label
+            htmlFor="categorySelect"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Categoría
+          </label>
+          <select
+            id="categorySelect"
+            value={categorySelect}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setCategorySelect(newValue);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value={""}>-- Selecciona --</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat.value} value={cat.index}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="typeSelect"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Tipo
+          </label>
+          <select
+            id="typeSelect"
+            value={typeSelect}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setTypeSelect(newValue);
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value={""}>-- Selecciona --</option>
+            {TYPES.map((type) => (
+              <option key={type.value} value={type.index}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Content List */}
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
-      ) : filteredResources.length === 0 ? (
+      ) : !filteredResources || filteredResources.length === 0 ? (
         <div className="text-center py-20">
           <svg
             className="w-16 h-16 mx-auto text-gray-400 mb-4"
@@ -181,20 +268,30 @@ export default function GestionContenidos() {
         <div className="space-y-4">
           {filteredResources.map((resource) => (
             <ResourceCard
+              userId={user.id}
               key={resource.id}
               resource={resource}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onPublish={handlePublish}
+              onUnpublish={handleUnpublish}
             />
           ))}
         </div>
       )}
-
+      <PaginationBar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalSize}
+        setPageSize={setPageSize}
+        pageSize={pageSize}
+      />
       {/* Modal */}
       <ResourceModal
         isOpen={showModal}
         editingResource={editingResource}
         formData={formData}
+        setError={setError}
         error={error}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}

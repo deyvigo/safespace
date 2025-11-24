@@ -101,7 +101,8 @@ public class AuthServiceImpl implements AuthService {
             "username", userEntity.getUsername(),
             "name", userEntity.getName(),
             "lastName", userEntity.getLastName(),
-            "role", userEntity.getRole().getRole()
+            "role", userEntity.getRole().getRole(),
+                "id", userEntity.getId()
         );
 
         String token = jwtService.buildToken(claims);

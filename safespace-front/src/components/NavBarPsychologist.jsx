@@ -1,7 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { ReactSVG } from "react-svg";
 import { useState, useEffect, useRef } from "react";
 
 export default function NavBarStudent() {

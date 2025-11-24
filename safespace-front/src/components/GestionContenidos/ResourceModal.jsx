@@ -65,6 +65,7 @@ export default function ResourceModal({
   isOpen,
   editingResource,
   formData,
+  setError,
   error,
   onClose,
   onSubmit,
@@ -82,7 +83,7 @@ export default function ResourceModal({
       }
     }
   }, [editingResource, onChange, isOpen]);
-  console.log(formData);
+
   useEffect(() => {
     if (!editingResource) {
       localStorage.setItem("savedCreateForm", JSON.stringify(formData));
@@ -97,6 +98,7 @@ export default function ResourceModal({
     const newImageCount = currentImageCount + files.length;
 
     if (newImageCount > 3) {
+      setError("Excediste la cantidad máxima de imágenes (3)");
       return;
     }
 
@@ -106,11 +108,13 @@ export default function ResourceModal({
       const file = files[i];
 
       if (file.size > 5 * 1024 * 1024) {
-        continue;
+        setError(`El archivo ${file.name} tiene un resolución muy grande`);
+        return;
       }
 
       if (!file.type.startsWith("image/")) {
-        continue;
+        setError(`El archivo ${file.name} no es una imágen`);
+        return;
       }
 
       try {
@@ -118,19 +122,21 @@ export default function ResourceModal({
         const base64 = await convertToBase64(webpImage);
 
         if (base64.length > 400000) {
+          setError("Una de las imágenes tiene un resolución grande");
           continue;
         }
 
         newBase64Images.push(base64);
-      } catch (error) {
-        console.error(`Error processing image ${file.name}:`, error);
+      } catch (err) {
+        setError(`Error procesando la imagen ${file.name}, ${err}`);
+        console.error(`Error processing image ${file.name}:`, err);
       }
     }
 
     if (newBase64Images.length > 0) {
       onChange((prev) => ({
         ...prev,
-        images: [...prev.images, ...newBase64Images],
+        images: [...prev.images, ...newBase64Images.map((el) => ({public_url: el}))],
       }));
     }
   };
@@ -300,9 +306,9 @@ export default function ResourceModal({
             {formData.images.length > 0 && (
               <div className="flex gap-2 overflow-auto mb-4">
                 {formData.images.map((img, index) => (
-                  <div key={index} className="flex-none sm:flex-1 relative">
+                  <div key={index + img.public_url} className="flex-none sm:flex-1 relative">
                     <img
-                      src={img}
+                      src={img.public_url}
                       alt={`Imagen ${index + 1}`}
                       width={220}
                       height={100}

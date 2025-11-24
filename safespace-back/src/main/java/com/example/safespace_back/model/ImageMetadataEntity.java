@@ -20,7 +20,10 @@ public class ImageMetadataEntity {
     @Column(nullable = false)
     private String public_URL;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Column(nullable = false)
+    private String publicID;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_id")
     private DigitalResourcesEntity resourceParent;
 

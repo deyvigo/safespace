@@ -1,4 +1,5 @@
 package com.example.safespace_back.service.implement;
+import com.example.safespace_back.dto.internal.CloudinaryUploadResult;
 import com.example.safespace_back.service.CloudinaryService;
 import org.springframework.stereotype.Service;
 import com.example.safespace_back.repository.ImageMetadataRepository;
@@ -20,14 +21,19 @@ public class ImageMetadataServiceImp implements ImageMetadataService {
 
     @Override
     public ImageMetadataEntity uploadAndCreate(String base64, DigitalResourcesEntity parent) {
-        String publicUrl = cloudinaryService.uploadBase64(base64);
-        System.out.println("Imagen guardada");
-        System.out.println(publicUrl);
-        ImageMetadataEntity image = new ImageMetadataEntity();
-        image.setPublic_URL(publicUrl);
-        image.setResourceParent(parent);
+        CloudinaryUploadResult result = cloudinaryService.uploadBase64(base64);
 
+        ImageMetadataEntity image = new ImageMetadataEntity();
+        image.setPublic_URL(result.secureUrl());
+        image.setResourceParent(parent);
+        image.setPublicID(result.publicId());
         return imageMetadataRepository.save(image);
+    }
+
+    @Override
+    public void deleteImage(String publicID){
+        cloudinaryService.deleteImage(publicID);
+        imageMetadataRepository.deleteByPublicID(publicID);
     }
 
 }
