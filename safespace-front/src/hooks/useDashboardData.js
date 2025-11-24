@@ -19,7 +19,21 @@ export const useDashboardData = () => {
           getDigitalResources(),
           getNotifications(),
         ]);
-        setSessions(sessionsData);
+        
+        // Transformar datos de snake_case a camelCase
+        const transformedSessions = sessionsData.map(session => ({
+          id: session.id,
+          type: session.type,
+          status: session.status,
+          sessionDateTime: session.session_date_time,
+          durationMinutes: session.duration_minutes,
+          studentId: session.student_id,
+          studentName: session.student_name,
+          psychologistId: session.psychologist_id,
+          psychologistName: session.psychologist_name,
+        }));
+        
+        setSessions(transformedSessions);
         setDigitalResources(resourcesData);
         setNotifications(notificationsData);
       } catch (error) {
