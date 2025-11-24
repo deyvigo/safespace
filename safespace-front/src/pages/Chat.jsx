@@ -93,7 +93,7 @@ export const Chat = () => {
 
   return (
     <div className="w-dvw flex flex-row px-4 sm:px-8 lg:px-14 h-[calc(100vh-5rem)] py-4 bg-gradient-to-br from-slate-50 to-slate-100">
-      <main className="w-full h-full flex flex-row rounded-2xl shadow-2xl shadow-black/20 overflow-hidden bg-white backdrop-blur-sm">
+      <main className="w-full h-full flex flex-col lg:flex-row rounded-2xl shadow-2xl shadow-black/20 overflow-hidden bg-white backdrop-blur-sm">
         <ConversationBox
           selectedConversationId={selectedConversation.id}
           onSelectConversation={setSelectedConversation}

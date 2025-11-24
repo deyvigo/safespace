@@ -51,9 +51,12 @@ export default function GestionContenidos() {
     fetchDigitalResources: refresh,
   } = useGetAllDigitalResources(pageSize, currentPage, setTotalSize, typeSelect, categorySelect);
 
+  const [isUploading, setUpload] = useState(false);
+
   const handleCreate = () => {
     setEditingResource(null);
     setFormData(INITIAL_FORM_DATA);
+    localStorage.setItem("savedCreateForm", JSON.stringify(formData));
     setError("");
     setShowModal(true);
   };
@@ -112,6 +115,7 @@ export default function GestionContenidos() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setUpload(true);
     try {
       if (editingResource) {
         await updateDigitalResource(editingResource.id, formData);
@@ -122,6 +126,8 @@ export default function GestionContenidos() {
       await refresh(opt);
     } catch (err) {
       setError(err.response?.data?.message || "Error al guardar el contenido");
+    } finally {
+      setUpload(false);
     }
   };
 
@@ -296,6 +302,7 @@ export default function GestionContenidos() {
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         onChange={setFormData}
+        loading={loading || isUploading}
       />
     </div>
   );

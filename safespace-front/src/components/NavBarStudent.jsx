@@ -49,7 +49,7 @@ export default function NavBarStudent() {
     >
       <div
         className={`absolute left-0 right-0 top-full bg-white border-b-2 border-slate-600 transition-all duration-500 ease-in-out overflow-hidden origin-top ${
-          dropActive ? "opacity-100 max-h-[300px]" : "opacity-20 max-h-0"
+          dropActive ? "opacity-100 max-h-[350px]" : "opacity-20 max-h-0"
         }`}
       >
         <div className="flex flex-col gap-y-3 text-center items-center  py-5">
@@ -77,6 +77,12 @@ export default function NavBarStudent() {
           >
             Dashboard
           </Link>
+          <Link
+            to="/chat"
+            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
+          >
+            Chat
+          </Link>
           {token ? (
             <button
               onClick={handleLogout}
@@ -100,7 +106,7 @@ export default function NavBarStudent() {
       >
         SafeSpace
       </Link>
-      <div className="block sm:hidden">
+      <div className="block lg:hidden">
         <ReactSVG
           onClick={handleHamburguerClick}
           src="hamburguer.svg"
@@ -113,7 +119,7 @@ export default function NavBarStudent() {
           }}
         />
       </div>
-      <div className="space-x-6  items-center hidden sm:flex">
+      <div className="space-x-6  items-center hidden lg:flex">
         <Link
           to="/"
           className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
@@ -138,7 +144,10 @@ export default function NavBarStudent() {
         >
           Dashboard
         </Link>
-        <Link to="/chat" className="hover:text-indigo-200 transition-colors">
+        <Link
+          to="/chat"
+          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
+        >
           Chat
         </Link>
         {token ? (

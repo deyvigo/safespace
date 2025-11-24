@@ -11,7 +11,7 @@ export const ConversationItem = ({ name, last_message, date, onClick, active, se
   return (
     <section
       onClick={onClick}
-      className={`w-full min-h-[80px] py-3 px-4 flex items-center gap-3 cursor-pointer border-b border-slate-100 transition-all duration-200 ${
+      className={`w-full min-h-[80px] min-w-[190px] py-3 px-4 flex items-center gap-3 cursor-pointer border-b border-slate-100 transition-all duration-200 ${
         active 
           ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-500 shadow-sm" 
           : "hover:bg-slate-50 hover:border-l-2 hover:border-l-slate-300"

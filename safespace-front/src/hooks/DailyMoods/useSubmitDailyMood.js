@@ -6,7 +6,7 @@ export default function useSubmitDailyMood() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const sendMood = async ({ moods, description }) => {
+  const sendMood = async ({ moods, description, f = ()=>{} }) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -19,6 +19,7 @@ export default function useSubmitDailyMood() {
       setError(err);
     } finally {
       setLoading(false);
+      f();
     }
   };
 

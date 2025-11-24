@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import useGetDailyRates from "../../hooks/DailyRate/useGetDailyRates";
-import useGetWeekResume from "../../hooks/WeekResume/useGetWeekResume";
+import Loader from "../Loader";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -21,12 +21,7 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-export default function EmotionChart() {
-
-  const { rates, loadingRates, errRates } = useGetDailyRates();
-  const { weekResume, loadingResume, errResume } = useGetWeekResume();
-
-  console.log(weekResume);
+export default function EmotionChart({weekResume, loadingResume, rates, loadingRates}) {
 
   return (
     <div className="min-h-[50vh] flex flex-3 flex-col justify-center items-center bg-white border-black border-2 rounded-2xl px-2 py-5 sm:px-5">
@@ -36,7 +31,7 @@ export default function EmotionChart() {
         </h2>
         <p className="text-gray-400 text-base sm:text-xl">Últimos 7 dias</p>
       </div>
-      <div className="flex lg:flex-3 justify-center items-center w-full h-[300px] lg:h-full  min-h-0 mb-5 sm:mb-0">
+      <div className="flex lg:flex-3 justify-center items-center w-full h-[300px] min-h-[150px] lg:h-full mb-5 sm:mb-0">
         <ResponsiveContainer width="100%" height="100%" minHeight={0}>
           <LineChart data={rates} margin={{ right: 30, left: 20, top: 10 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -85,12 +80,23 @@ export default function EmotionChart() {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      {weekResume && (
-        <div className="flex flex-1 text-center items-center">
-          <p className="text-gray-400 text-base sm:text-xl">
-            <span className="text-cyan-500 font-bold">{weekResume.title}</span>
-            {" "}{weekResume.description}
-          </p>
+      {!loadingResume ? (
+        weekResume ? (
+          <div className="flex flex-1 text-center items-center">
+            <p className="text-gray-400 text-base sm:text-xl">
+              <span className="text-cyan-500 font-bold">
+                {weekResume.title}
+              </span>{" "}
+              {weekResume.description}
+            </p>
+          </div>
+        ) : (
+          <></>
+        )
+      ) : (
+        <div className="flex flex-col justify-center items-center gap-3 mt-4">
+          <Loader className={"w-full h-10"} />
+          <p className="text-gray-400">Analizando tu progreso semanal</p>
         </div>
       )}
     </div>
