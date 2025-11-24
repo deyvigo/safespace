@@ -1,18 +1,16 @@
 package com.example.safespace_back.controller;
 
+
 import java.util.List;
 
+import com.example.safespace_back.model.DigitalResourcesEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.safespace_back.dto.in.DigitalResourceRequestDTO;
 import com.example.safespace_back.dto.out.DigitalResourceResponseDTO;
@@ -39,8 +37,14 @@ public class DigitalResourceController {
   }
 
   @GetMapping
-  public ResponseEntity<List<DigitalResourceResponseDTO>> getAllResources() {
-    List<DigitalResourceResponseDTO> resources = digitalResourcesService.findAll();
+  public ResponseEntity<Page<DigitalResourceResponseDTO>> getAllResources(
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "5") int size,
+          @RequestParam(required = false) Long type,
+          @RequestParam(required = false) Long category
+  ) {
+      Pageable pageable = PageRequest.of(page, size);
+      Page<DigitalResourceResponseDTO> resources = digitalResourcesService.findAll(pageable,type,category);
     return ResponseEntity.ok(resources);
   }
 
@@ -50,6 +54,60 @@ public class DigitalResourceController {
   ) {
     DigitalResourceResponseDTO resource = digitalResourcesService.findById(id);
     return ResponseEntity.ok(resource);
+  }
+
+  @GetMapping("/published")
+  public ResponseEntity<Page<DigitalResourceResponseDTO>> getResourcesPublished(
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "5") int size,
+          @RequestParam(required = false) Long type,
+          @RequestParam(required = false) Long category) {
+      Pageable pageable = PageRequest.of(page, size);
+      Page<DigitalResourceResponseDTO> resource = digitalResourcesService.findAllPublished(pageable,type,category);
+      return ResponseEntity.ok(resource);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<Page<DigitalResourceResponseDTO>> getNyResources(
+          @AuthenticationPrincipal UserEntity currentUser,
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "5") int size,
+          @RequestParam(required = false) Long type,
+          @RequestParam(required = false) Long category
+  ) {
+      Pageable pageable = PageRequest.of(page, size);
+      Page<DigitalResourceResponseDTO> resource = digitalResourcesService.findAllMe(currentUser,pageable,type,category);
+      return ResponseEntity.ok(resource);
+  }
+
+  @GetMapping("/pending")
+  public ResponseEntity<Page<DigitalResourceResponseDTO>> getPendingOthersResources(
+          @AuthenticationPrincipal UserEntity currentUser,
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "5") int size,
+          @RequestParam(required = false) Long type,
+          @RequestParam(required = false) Long category
+  ) {
+      Pageable pageable = PageRequest.of(page, size);
+      Page<DigitalResourceResponseDTO> resource = digitalResourcesService.findAllNotPublished(currentUser,pageable,type,category);
+      return ResponseEntity.ok(resource);
+  }
+
+  @PutMapping("/publish/{id}")
+  public ResponseEntity<Void> publishResource(
+      @PathVariable Long id,
+      @AuthenticationPrincipal UserEntity currentUser
+  ) {
+      digitalResourcesService.publish(id,currentUser);
+      return ResponseEntity.noContent().build();
+  }
+
+  @PutMapping("/unpublish/{id}")
+  public ResponseEntity<Void> unpublishResource(
+          @PathVariable Long id
+  ) {
+      digitalResourcesService.unPublish(id);
+      return ResponseEntity.noContent().build();
   }
 
   @PutMapping("/{id}")

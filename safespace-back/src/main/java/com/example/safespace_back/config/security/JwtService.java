@@ -29,7 +29,6 @@ public class JwtService {
                 .build()
                 .parse(token);
         } catch (SignatureException se) {
-            System.out.println("Invalid JWT signature");
             return null;
         }
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import useCompleteSession from "../../hooks/Session/useCompleteSession";
+import useGetSessionById from "../../hooks/Session/useGetSessionById";
 import ActionModal from "../Sesiones/ActionModal";
 
 export default function SesionBox({ sesion, onSessionUpdate }) {
@@ -11,6 +12,11 @@ export default function SesionBox({ sesion, onSessionUpdate }) {
     title: "",
     message: "",
   });
+  const {
+    fetchSession,
+    loading: isFetchingLink,
+    error: fetchLinkError,
+  } = useGetSessionById();
 
   const closeModal = () => {
     setModalState({ isOpen: false, mode: null, title: "", message: "" });
@@ -38,6 +44,20 @@ export default function SesionBox({ sesion, onSessionUpdate }) {
     }
   };
 
+  const handleJoinSession = async () => {
+    try {
+      const sessionDetails = await fetchSession(sesion.id);
+      if (sessionDetails && sessionDetails.link) {
+        window.open(sessionDetails.link, "_blank", "noopener,noreferrer");
+      } else {
+        alert("No se encontró un link para esta sesión.");
+      }
+    } catch (error) {
+      console.error("Error al obtener el link de la sesión:", error);
+      alert("Hubo un error al obtener el link de la sesión.");
+    }
+  };
+
   return (
     <div className="flex flex-col text-black p-5 border-gray-400 border-2 rounded-2xl gap-5 bg-white shadow">
       <div className="flex flex-row items-center justify-between">
@@ -53,7 +73,11 @@ export default function SesionBox({ sesion, onSessionUpdate }) {
               : "Hora no especificada"}
           </p>
         </div>
-        <div className="bg-green-500 rounded-xl px-3 py-1">
+        <div
+          className={`rounded-xl px-3 py-1 ${
+            sesion?.type === "ONLINE" ? "bg-green-500" : "bg-blue-500"
+          }`}
+        >
           {sesion?.type === "ONLINE" ? (
             <span className="text-white">Virtual</span>
           ) : (
@@ -75,7 +99,19 @@ export default function SesionBox({ sesion, onSessionUpdate }) {
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        {sesion.type === "ONLINE" ? (
+          <button
+            type="button"
+            onClick={handleJoinSession}
+            disabled={isFetchingLink}
+            className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 disabled:bg-green-300 disabled:cursor-not-allowed"
+          >
+            {isFetchingLink ? "Cargando..." : "Unirse a la sesión"}
+          </button>
+        ) : (
+          <div /> // Placeholder to keep alignment
+        )}
         <button
           type="button"
           onClick={handleCompleteSession}

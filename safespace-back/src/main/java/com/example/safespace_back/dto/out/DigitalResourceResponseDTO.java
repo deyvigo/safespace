@@ -12,5 +12,7 @@ public record DigitalResourceResponseDTO(
   CategoryDigitalResource category,
   TypeDigitalResource type,
   String link,
+  Long id_psychologist,
+  boolean published,
   List<ImageMetadataDTO> images
 ) {}

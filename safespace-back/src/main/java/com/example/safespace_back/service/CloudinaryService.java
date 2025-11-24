@@ -1,7 +1,10 @@
 package com.example.safespace_back.service;
 
+import com.example.safespace_back.dto.internal.CloudinaryUploadResult;
+
 import java.io.IOException;
 
 public interface CloudinaryService {
-    String uploadBase64(String base64Image) ;
+    CloudinaryUploadResult uploadBase64(String base64Image) ;
+    void deleteImage(String publicId);
 }

@@ -1,5 +1,6 @@
 package com.example.safespace_back.dto.in;
 
+import com.example.safespace_back.dto.out.ImageMetadataDTO;
 import com.example.safespace_back.model.CategoryDigitalResource;
 import com.example.safespace_back.model.TypeDigitalResource;
 import java.util.List;
@@ -17,5 +18,6 @@ public record DigitalResourceRequestDTO(
   @NotNull(message = "type is required")
   TypeDigitalResource type,
   String link,
-  List<String> images
+  boolean published,
+  List<ImageMetadataDTO> images
 ) {}
