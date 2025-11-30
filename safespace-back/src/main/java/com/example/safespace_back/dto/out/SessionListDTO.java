@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.example.safespace_back.model.SessionStatus;
 import com.example.safespace_back.model.SessionType;
 
-// DTO simplificado para listados
 public record SessionListDTO(
   Long id,
   SessionType type,
