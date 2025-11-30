@@ -233,4 +233,14 @@ public class SessionServiceImpl implements SessionService {
         .map(sessionMapper::toListDTO)
         .collect(Collectors.toList());
   }
+
+  @Override
+  public List<SessionListDTO> getCompletedAndConfirmedSessions(UserEntity user) {
+    List<SessionStatus> statuses = List.of(SessionStatus.COMPLETED, SessionStatus.CONFIRMED);
+    List<SessionEntity> sessions = sessionRepository.findByStatusInOrderBySessionDateTimeDesc(statuses);
+    
+    return sessions.stream()
+        .map(sessionMapper::toListDTO)
+        .collect(Collectors.toList());
+  }
 }

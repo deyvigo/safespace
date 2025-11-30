@@ -17,4 +17,5 @@ public interface SessionService {
   List<SessionListDTO> getMySessionsAsStudent(UserEntity student);
   List<SessionListDTO> getMySessionsAsPsychologist(UserEntity psychologist);
   List<SessionListDTO> getPendingRequests(UserEntity psychologist);
+  List<SessionListDTO> getCompletedAndConfirmedSessions(UserEntity user);
 }
