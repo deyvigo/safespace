@@ -4,9 +4,11 @@ import { useCreateSession } from "../hooks/Session/useCreateSession";
 import useGetMySessions from "../hooks/Session/useGetMySessions";
 import useGetPsychologist from "../hooks/Session/userGetPsichologist";
 import useGetSessionById from "../hooks/Session/useGetSessionById";
-import dayjs from "dayjs";
-import "dayjs/locale/es"
-dayjs.locale("es")
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useGetAvailability } from "../hooks/useGetAvailability";
+import ActionModal from "../components/Sesiones/ActionModal";
 
 const formatDateTime = (isoString) => {
   if (!isoString) return "Sin fecha";
@@ -70,24 +72,9 @@ const getStatusStyles = (status) => {
       };
   }
 };
-function PsychologistProfileCard() {
-  const { psychologist, loading, error } = useGetPsychologist();
 
-  const ProfileIcon = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-16 h-16 text-cyan-600 mb-4 mx-auto"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
+function PsychologistProfileCard({ onOpenSchedule }) {
+  const { psychologist, loading, error } = useGetPsychologist();
 
   if (loading) {
     return (
@@ -119,7 +106,6 @@ function PsychologistProfileCard() {
       <h3 className="text-2xl font-bold mb-4 text-center text-slate-800">
         Tu Profesional
       </h3>
-      {ProfileIcon}
       <div className="text-center mb-5">
         <p className="text-xl font-semibold text-cyan-700">{fullName}</p>
         <p className="text-slate-600 text-sm italic mt-1">
@@ -136,11 +122,21 @@ function PsychologistProfileCard() {
           {psychologist.university || "N/A"}
         </p>
         <p className="text-slate-700">
-          🎂 <span className="font-medium ml-2">Nacimiento:</span> {formattedBirthday}
+          🎂 <span className="font-medium ml-2">Nacimiento:</span>{" "}
+          {formattedBirthday}
         </p>
         <p className="text-slate-700">
-          📞 <span className="font-medium ml-2">Contacto:</span> Vía chat interno
+          📞 <span className="font-medium ml-2">Contacto:</span> Vía chat
+          interno
         </p>
+      </div>
+      <div className="mt-4">
+        <button
+          onClick={onOpenSchedule}
+          className="w-full bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700"
+        >
+          Ver Horarios
+        </button>
       </div>
     </div>
   );
@@ -183,18 +179,278 @@ function JoinSessionButton({ sessionId }) {
           d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h.01M4 12h.01M4 18h.01"
         />
       </svg>
-      <span className="text-sm font-medium">{loading ? "Cargando..." : "Unirse"}</span>
+      <span className="text-sm font-medium">
+        {loading ? "Cargando..." : "Unirse"}
+      </span>
     </button>
   );
 }
-export default function SolicitarSesion() {
+
+function ScheduleModal({
+  isOpen,
+  onClose,
+  psychologist,
+  refreshSessions,
+  studentSessions,
+}) {
   const { token, user } = useContext(AuthContext);
   const {
     submitSession,
     loading: creating,
     error: createError,
   } = useCreateSession();
-  const [localError, setLocalError] = useState(null);
+  const { availableSlots, loading, error, fetchAvailableSlots } =
+    useGetAvailability();
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [tipo, setTipo] = useState("PRESENTIAL");
+  const [motivo, setMotivo] = useState("");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [sessionToConfirm, setSessionToConfirm] = useState(null);
+  const [selection, setSelection] = useState(null);
+
+  const handleDatesSet = (arg) => {
+    fetchAvailableSlots(
+      arg.start.toISOString().split("T")[0],
+      arg.end.toISOString().split("T")[0]
+    );
+    setSelection(null);
+    setSelectedSlot(null);
+  };
+
+  const handleDateClick = (clickInfo) => {
+    const start = clickInfo.date;
+    const end = new Date(start.getTime() + 60 * 60 * 1000); // Assume 1 hour duration
+    setSelectedSlot({ start, end });
+    setSelection({
+      title: "Seleccionado",
+      start,
+      end,
+      backgroundColor: "#60A5FA",
+      borderColor: "#60A5FA",
+    });
+  };
+
+  const handleEventClick = (clickInfo) => {
+    if (clickInfo.event.title === "Seleccionado" || clickInfo.event.title === "Ocupado") return;
+    setSelectedSlot({
+      start: clickInfo.event.start,
+      end: clickInfo.event.end,
+    });
+    setSelection({
+      title: "Seleccionado",
+      start: clickInfo.event.start,
+      end: clickInfo.event.end,
+      backgroundColor: "#60A5FA",
+      borderColor: "#60A5FA",
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!selectedSlot) return;
+
+    const payload = {
+      type: tipo,
+      session_date_time: selectedSlot.start.toISOString(),
+      student_reason: motivo,
+      duration_minutes: (selectedSlot.end - selectedSlot.start) / (1000 * 60),
+      student_id: user.id || user.userId || user.sub,
+    };
+    setSessionToConfirm(payload);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    if (!sessionToConfirm) return;
+
+    try {
+      const res = await submitSession(sessionToConfirm, token);
+      if (res) {
+        refreshSessions();
+        onClose(); // Close the main modal
+      }
+    } catch (err) {
+      console.error("Create session error:", err);
+    } finally {
+      setIsConfirmModalOpen(false);
+      setSessionToConfirm(null);
+      setSelection(null);
+    }
+  };
+
+  const availableEvents = availableSlots.map((slot) => ({
+    title: "Disponible",
+    start: slot.startTime,
+    end: slot.endTime,
+    backgroundColor: "#34D399",
+    borderColor: "#34D399",
+  }));
+
+  const studentEvents = (studentSessions || []).map(session => ({
+    title: 'Ocupado',
+    start: session.session_date_time,
+    end: new Date(new Date(session.session_date_time).getTime() + session.duration_minutes * 60000),
+    backgroundColor: '#F87171',
+    borderColor: '#F87171',
+  }));
+
+  const events = [...availableEvents, ...studentEvents];
+
+  if (selection) {
+    events.push(selection);
+  }
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 w-full max-w-6xl shadow-lg relative">
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 text-slate-600"
+          >
+            ✕
+          </button>
+          <h2 className="text-xl font-semibold mb-3 text-slate-800 text-center">
+            Horarios Disponibles
+          </h2>
+          <div className="flex flex-row md:grid-cols-2 gap-6 items-start">
+            <div className="flex-2 w-full">
+              <FullCalendar
+                plugins={[timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                events={events}
+                datesSet={handleDatesSet}
+                dateClick={handleDateClick}
+                eventClick={handleEventClick}
+                slotMinTime="08:00:00"
+                slotMaxTime="20:00:00"
+                height="70vh"
+                locale="es"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "timeGridWeek,timeGridDay",
+                }}
+              />
+            </div>
+            <div className="flex flex-1 flex-row justify-center items-center w-full max-w-md md:mt-10 ">
+              {selectedSlot ? (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col gap-3 mt-4"
+                >
+                  <h3 className="text-lg font-semibold text-center">
+                    Confirmar Cita
+                  </h3>
+                  <p className="text-center">
+                    Fecha: {selectedSlot.start.toLocaleDateString()}
+                  </p>
+                  <p className="text-center">
+                    Hora:{" "}
+                    {selectedSlot.start.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    -{" "}
+                    {selectedSlot.end.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <label className="text-sm font-medium text-slate-700">
+                    Tipo
+                  </label>
+                  <select
+                    value={tipo}
+                    onChange={(e) => setTipo(e.target.value)}
+                    className="w-full border p-2 rounded text-slate-800 bg-white"
+                  >
+                    <option value="PRESENTIAL">Presencial</option>
+                    <option value="ONLINE">Virtual</option>
+                  </select>
+                  <label className="text-sm font-medium text-slate-700">
+                    Motivo / notas
+                  </label>
+                  <textarea
+                    value={motivo}
+                    onChange={(e) => setMotivo(e.target.value)}
+                    className="w-full border p-2 rounded text-slate-800 bg-white"
+                    placeholder="Escribe un breve motivo para tu consulta"
+                  />
+                  {createError && (
+                    <p className="text-red-600 text-center">
+                      Error al solicitar la sesión
+                    </p>
+                  )}
+                  <div className="flex justify-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSlot(null)}
+                      className="bg-gray-200 px-4 py-2 rounded"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded"
+                    >
+                      Agendar Sesión
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="text-center text-slate-500 mt-4 md:mt-16">
+                  <p>
+                    Selecciona un horario disponible o haz click en una fecha y
+                    hora para agendar una cita.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <ActionModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmSubmit}
+        title="Confirmar Solicitud de Sesión"
+        confirmText={creating ? "Enviando..." : "Confirmar"}
+        isConfirmDisabled={creating}
+      >
+        {sessionToConfirm && (
+          <div>
+            <p>
+              <strong>Fecha:</strong>{" "}
+              {new Date(
+                sessionToConfirm.session_date_time
+              ).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>Hora:</strong>{" "}
+              {new Date(sessionToConfirm.session_date_time).toLocaleTimeString(
+                [],
+                { hour: "2-digit", minute: "2-digit" }
+              )}
+            </p>
+            <p>
+              <strong>Tipo:</strong>{" "}
+              {getSessionTypeLabel(sessionToConfirm.type)}
+            </p>
+            <p>
+              <strong>Motivo:</strong>{" "}
+              {sessionToConfirm.student_reason || "No especificado"}
+            </p>
+          </div>
+        )}
+      </ActionModal>
+    </>
+  );
+}
+
+export default function SolicitarSesion() {
   const {
     sessions,
     loading: loadingSessions,
@@ -239,6 +495,8 @@ export default function SolicitarSesion() {
       return false;
     }
   };
+  const { psychologist } = useGetPsychologist();
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
   return (
     <div className="p-6 mx-auto max-w-7xl pt-10 bg-gray-50 min-h-screen text-slate-800">
@@ -253,7 +511,7 @@ export default function SolicitarSesion() {
         </div>
         <div>
           <button
-            onClick={() => setModalOpen(true)}
+            onClick={() => setIsScheduleModalOpen(true)}
             className="bg-white border border-cyan-200 text-cyan-700 px-4 py-2 rounded-lg shadow-sm hover:bg-cyan-50"
           >
             Agendar nueva
@@ -272,7 +530,6 @@ export default function SolicitarSesion() {
           ) : sessions && sessions.length > 0 ? (
             <div className="space-y-4">
               {sessions.map((s) => {
-                // Extracción y mapeo de datos del backend
                 const dateTime = s.session_date_time;
                 const duration = s.duration_minutes;
                 const professionalName = s.psychologist_name;
@@ -330,81 +587,18 @@ export default function SolicitarSesion() {
           )}
         </div>
         <div className="lg:col-span-1">
-          <PsychologistProfileCard />
+          <PsychologistProfileCard
+            onOpenSchedule={() => setIsScheduleModalOpen(true)}
+          />
         </div>
       </div>
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-lg relative">
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-3 right-3 text-slate-600"
-            >
-              ✕
-            </button>
-            <h2 className="text-xl font-semibold mb-3 text-slate-800">
-              Nueva solicitud
-            </h2>
-            <form
-              onSubmit={async (e) => {
-                const ok = await handleSubmit(e);
-                if (ok) setModalOpen(false);
-              }}
-              className="flex flex-col gap-3"
-            >
-              <label className="text-sm font-medium text-slate-700">
-                Inicio
-              </label>
-              <input
-                type="datetime-local"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-                required
-                className="w-full border p-2 rounded text-slate-800 bg-white"
-              />
-              <label className="text-sm font-medium text-slate-700">Tipo</label>
-              <select
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
-                className="w-full border p-2 rounded text-slate-800 bg-white"
-              >
-                <option value="presencial">Presencial</option>
-                <option value="virtual">Virtual</option>
-              </select>
-              <label className="text-sm font-medium text-slate-700">
-                Motivo / notas
-              </label>
-              <textarea
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-                className="w-full border p-2 rounded text-slate-800 bg-white"
-              />
-              {(localError || createError) && (
-                <p className="text-red-600">
-                  {(localError && localError.toString()) ||
-                    "Error al solicitar la sesión"}
-                </p>
-              )}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="mr-2 bg-gray-200 px-4 py-2 rounded"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={creating}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded"
-                >
-                  {creating ? "Enviando..." : "Solicitar sesión"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
+        psychologist={psychologist}
+        refreshSessions={refresh}
+        studentSessions={sessions}
+      />
     </div>
   );
 }
