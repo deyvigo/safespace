@@ -1,15 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { ReactSVG } from "react-svg";
 import { useState, useEffect, useRef } from "react";
 
-export default function NavBarStudent() {
+export default function NavBarStudent({data}) {
   const [dropActive, setDropActive] = useState(false);
   const { token, logout } = useContext(AuthContext);
   const navRef = useRef(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 640) {
@@ -33,6 +33,8 @@ export default function NavBarStudent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  let mobilSize = 70 * data.length;
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -49,40 +51,22 @@ export default function NavBarStudent() {
     >
       <div
         className={`absolute left-0 right-0 top-full bg-white border-b-2 border-slate-600 transition-all duration-500 ease-in-out overflow-hidden origin-top ${
-          dropActive ? "opacity-100 max-h-[350px]" : "opacity-20 max-h-0"
+          dropActive
+            ? `opacity-100 max-h-[${mobilSize}px]`
+            : "opacity-20 max-h-0"
         }`}
       >
         <div className="flex flex-col gap-y-3 text-center items-center  py-5">
-          <Link
-            to="/"
-            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
-          >
-            Inicio
-          </Link>
-          <Link
-            to="/biblioteca"
-            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
-          >
-            Biblioteca
-          </Link>
-          <Link
-            to="/solicitar-sesion"
-            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
-          >
-            Solicitar sesión
-          </Link>
-          <Link
-            to="dashboard"
-            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
-          >
-            Dashboard
-          </Link>
-          <Link
-            to="/chat"
-            className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!"
-          >
-            Chat
-          </Link>
+          {data.map((el, idx) => (
+            <Link
+              to={el.link}
+              key={idx}
+              className="hover:text-cyan-600! border-b-2 pb-3 border-slate-200 text-lg transition-colors w-full visited:text-slate-800! text-slate-800!
+"
+            >
+              {el.label}
+            </Link>
+          ))}
           {token ? (
             <button
               onClick={handleLogout}
@@ -120,36 +104,17 @@ export default function NavBarStudent() {
         />
       </div>
       <div className="space-x-6  items-center hidden lg:flex">
-        <Link
-          to="/"
-          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
-        >
-          Inicio
-        </Link>
-        <Link
-          to="/biblioteca"
-          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
-        >
-          Biblioteca
-        </Link>
-        <Link
-          to="/solicitar-sesion"
-          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
-        >
-          Solicitar sesión
-        </Link>
-        <Link
-          to="/dashboard"
-          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
-        >
-          Dashboard
-        </Link>
-        <Link
-          to="/chat"
-          className="hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100!"
-        >
-          Chat
-        </Link>
+        {data.map((el, idx) => (
+          <Link
+            to={el.link}
+            key={idx}
+            className={`hover:text-white! text-lg transition-colors visited:text-indigo-100! text-indigo-100! ${
+              location.pathname === `${el.link}` ? "font-semibold! underline!" : ""
+            }`}
+          >
+            {el.label}
+          </Link>
+        ))}
         {token ? (
           <button
             onClick={handleLogout}

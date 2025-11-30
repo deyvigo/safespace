@@ -13,6 +13,7 @@ public record DigitalResourceResponseDTO(
   TypeDigitalResource type,
   String link,
   Long id_psychologist,
+  boolean favorite,
   boolean published,
   List<ImageMetadataDTO> images
 ) {}

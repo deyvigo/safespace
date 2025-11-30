@@ -41,10 +41,13 @@ public class DigitalResourceController {
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "5") int size,
           @RequestParam(required = false) Long type,
-          @RequestParam(required = false) Long category
+          @RequestParam(required = false) Long category,
+          @RequestParam(required = false) Boolean published,
+          @AuthenticationPrincipal UserEntity currentUser
   ) {
       Pageable pageable = PageRequest.of(page, size);
-      Page<DigitalResourceResponseDTO> resources = digitalResourcesService.findAll(pageable,type,category);
+      Long userId = (currentUser != null) ? currentUser.getId() : null;
+      Page<DigitalResourceResponseDTO> resources = digitalResourcesService.findAll(pageable,type,category,userId,published);
     return ResponseEntity.ok(resources);
   }
 

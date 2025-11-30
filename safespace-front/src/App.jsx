@@ -9,8 +9,7 @@ import {
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
-import NavBarStudent from "./components/NavBarStudent";
-import NavBarPsychologist from "./components/NavBarPsychologist";
+import NavBar from "./components/NavBar/NavBar";
 import Inicio from "./pages/Inicio";
 import Login from "./pages/Login";
 import Biblioteca from "./pages/Biblioteca";
@@ -34,9 +33,29 @@ function AppContent() {
     if (isLoginPage) return null;
 
     if (user?.role === "PSYCHOLOGIST") {
-      return <NavBarPsychologist />;
+      return (
+        <NavBar
+          data={[
+            { link: "/psicologo/dashboard", label: "Dashboard" },
+            { link: "/sesiones", label: "Sesiones" },
+            { link: "/mensajes-ia", label: "Mensajes IA" },
+            { link: "/gestion-contenidos", label: "Contenidos" },
+            { link: "/chat", label: "Chat" },
+          ]}
+        />
+      );
     } else if (user?.role === "STUDENT") {
-      return <NavBarStudent />;
+      return (
+        <NavBar
+          data={[
+            { link: "/", label: "Inicio" },
+            { link: "/biblioteca", label: "Biblioteca" },
+            { link: "/solicitar-sesion", label: "Solicitar sesión" },
+            { link: "/dashboard", label: "Dashboard" },
+            { link: "/chat", label: "Chat" },
+          ]}
+        />
+      );
     } else {
       // Si no hay usuario autenticado, mostrar logo de SafeSpace #!TODO
       return (

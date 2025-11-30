@@ -115,7 +115,7 @@ function PsychologistProfileCard() {
     : "N/A";
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg border border-slate-200 h-fit sticky top-6">
+    <div className="p-6 mx bg-white rounded-xl shadow-lg border border-slate-200 h-fit sticky top-6">
       <h3 className="text-2xl font-bold mb-4 text-center text-slate-800">
         Tu Profesional
       </h3>
@@ -241,7 +241,7 @@ export default function SolicitarSesion() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen text-slate-800">
+    <div className="p-6 mx-auto max-w-7xl pt-10 bg-gray-50 min-h-screen text-slate-800">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-3xl font-bold mb-1 text-slate-800">

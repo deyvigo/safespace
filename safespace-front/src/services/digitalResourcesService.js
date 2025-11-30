@@ -13,7 +13,7 @@ const getAuthHeaders = () => {
 
 // Asegurar que la URL base termine con /
 const getBaseUrl = () => {
-  return API_BASE_URL.endsWith('/') ? API_BASE_URL : `${API_BASE_URL}/`;
+  return API_BASE_URL.endsWith("/") ? API_BASE_URL : `${API_BASE_URL}/`;
 };
 
 export const getDigitalResources = async (
@@ -21,7 +21,8 @@ export const getDigitalResources = async (
   pageSize,
   currentPage,
   type,
-  category
+  category,
+  isPublished
 ) => {
   const params = new URLSearchParams();
 
@@ -29,6 +30,8 @@ export const getDigitalResources = async (
   params.set("size", pageSize);
 
   if (type !== null && type !== undefined) params.set("type", type);
+  if (isPublished !== null && isPublished !== undefined)
+    params.set("published", isPublished);
   if (category !== null && category !== undefined)
     params.set("category", category);
 
@@ -41,7 +44,7 @@ export const getDigitalResources = async (
     return response.data;
   } catch (error) {
     console.error("Error al obtener los recursos digitales:", error);
-    throw error;
+    return { content: [], total_pages: 0 };
   }
 };
 
@@ -85,7 +88,7 @@ export const publishDigitalResource = async (id) => {
     console.error("Error al publicar recurso digital:", error);
     throw error;
   }
-}
+};
 
 export const unpublishDigitalResource = async (id) => {
   try {
@@ -103,7 +106,10 @@ export const unpublishDigitalResource = async (id) => {
 
 export const deleteDigitalResource = async (id) => {
   try {
-    await axios.delete(`${getBaseUrl()}digital-resources/${id}`, getAuthHeaders());
+    await axios.delete(
+      `${getBaseUrl()}digital-resources/${id}`,
+      getAuthHeaders()
+    );
     return true;
   } catch (error) {
     console.error("Error al eliminar recurso digital:", error);

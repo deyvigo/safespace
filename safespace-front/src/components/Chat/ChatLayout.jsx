@@ -18,7 +18,7 @@ export const ChatLayout = ({ name, conversation_id, username, messages, updateMe
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-slate-50 flex-1 flex flex-col overflow-hidden">
+    <div className="bg-gradient-to-br from-white to-slate-50 flex-1 flex flex-col overflow-hidden  ">
       <header className="h-16 px-6 flex items-center border-b border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">

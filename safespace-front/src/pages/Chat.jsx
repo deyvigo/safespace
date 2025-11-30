@@ -92,17 +92,17 @@ export const Chat = () => {
 
 
   return (
-    <div className="w-dvw flex flex-row px-4 sm:px-8 lg:px-14 h-[calc(100vh-5rem)] py-4 bg-gradient-to-br from-slate-50 to-slate-100">
-      <main className="w-full h-full flex flex-col lg:flex-row rounded-2xl shadow-2xl shadow-black/20 overflow-hidden bg-white backdrop-blur-sm">
+    <div className="max-w-7xl mx-auto  w-dvw flex flex-row px-4 sm:px-8 lg:px-14 h-[calc(100vh-5rem)] py-4 bg-gradient-to-br from-slate-50 to-slate-100">
+      <main className="w-full h-full min-h-[650px] flex flex-col lg:flex-row rounded-2xl shadow-2xl shadow-black/20 overflow-hidden bg-white backdrop-blur-sm">
         <ConversationBox
           selectedConversationId={selectedConversation.id}
           onSelectConversation={setSelectedConversation}
           conversations={conversations}
           updateConversations={setConversations}
         />
-        {
-          selectedConversation.id === null ?
-          <ChatLayoutProtector /> :
+        {selectedConversation.id === null ? (
+          <ChatLayoutProtector />
+        ) : (
           <ChatLayout
             messages={messages}
             username={selectedConversation.username}
@@ -110,8 +110,8 @@ export const Chat = () => {
             name={selectedConversation.name}
             updateMessages={setMessages}
           />
-        }
+        )}
       </main>
     </div>
-  )
+  );
 }

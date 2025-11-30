@@ -1,6 +1,4 @@
 import { useState, useContext } from "react";
-import Buscador from "../components/Biblioteca/Buscador";
-import FiltradorTags from "../components/Biblioteca/FiltradorTags";
 import RecursoBox from "../components/Biblioteca/RecursoBox";
 import useGetAllDigitalResources from "../hooks/DigitalResources/useGetAllDigitalResources";
 import usePaginationController from "../hooks/Pagination/usePaginationController";
@@ -11,7 +9,8 @@ import { CATEGORIES, TYPES } from "../constants/digitalResources";
 export default function Biblioteca() {
   const [typeSelect, setTypeSelect] = useState("");
   const [categorySelect, setCategorySelect] = useState("");
-  const { user } = useContext(AuthContext);
+  
+
   const {
     currentPage,
     setCurrentPage,
@@ -20,20 +19,16 @@ export default function Biblioteca() {
     totalSize,
     setTotalSize,
   } = usePaginationController();
-  const {
-    digitalResources,
-    loading,
-    error,
-    setError,
-    fetchDigitalResources: refresh,
-  } = useGetAllDigitalResources(
+  const { digitalResources, error } = useGetAllDigitalResources(
     pageSize,
     currentPage,
     setTotalSize,
     typeSelect,
-    categorySelect
+    categorySelect,
+    true
   );
 
+  
   return (
     <div className="p-6 h-full w-full max-w-7xl m-auto">
       <div className="sm:text-left text-center my-3">
@@ -64,6 +59,7 @@ export default function Biblioteca() {
             onChange={(e) => {
               const newValue = e.target.value;
               setCategorySelect(newValue);
+              setCurrentPage(0);
             }}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           >
@@ -89,6 +85,7 @@ export default function Biblioteca() {
             onChange={(e) => {
               const newValue = e.target.value;
               setTypeSelect(newValue);
+              setCurrentPage(0);
             }}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           >
@@ -103,7 +100,7 @@ export default function Biblioteca() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-10 rounded-3xl my-5">
         {digitalResources.map((digitalResource) => (
-          <RecursoBox recurso={digitalResource} />
+          <RecursoBox key={digitalResource.id} recurso={digitalResource} />
         ))}
       </div>
       <PaginationBar

@@ -112,14 +112,14 @@ export default function PaginationBar({
         `
         <div
           onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
+            setCurrentPage((prev) => Math.min(prev + 1, Math.max(totalPages - 1,0)))
           }
           className="text-gray-500 hover:text-black transition-all duration-200 hover:cursor-pointer"
         >
           <ChevronRight className="h-13 w-[30px] sm:h-17 sm:w-[50px]" />
         </div>
         <div
-          onClick={() => setCurrentPage(totalPages - 1)}
+          onClick={() => setCurrentPage(Math.max(totalPages - 1,0))}
           className="text-gray-500 hover:text-black transition-all duration-200 hover:cursor-pointer"
         >
           <ChevronsRight className="h-13 w-[30px] sm:h-17 sm:w-[50px]" />

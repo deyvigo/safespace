@@ -129,7 +129,7 @@ export default function Sesiones() {
   };
 
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="max-w-7xl mx-auto p-6 bg-gray-50">
       <div className="flex flex-row justify-between">
         <div className="flex flex-col">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
@@ -175,7 +175,9 @@ export default function Sesiones() {
               ))
             : !apptLoading && (
                 <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
-                  <p className="text-gray-500">No tienes citas confirmadas para hoy.</p>
+                  <p className="text-gray-500">
+                    No tienes citas confirmadas para hoy.
+                  </p>
                 </div>
               )}
         </div>
@@ -193,7 +195,9 @@ export default function Sesiones() {
               ))
             : !apptLoading && (
                 <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
-                  <p className="text-gray-500">No tienes citas en tu historial.</p>
+                  <p className="text-gray-500">
+                    No tienes citas en tu historial.
+                  </p>
                 </div>
               )}
         </div>
@@ -217,14 +221,16 @@ export default function Sesiones() {
               ))
             : !pendingLoading && (
                 <div className="text-center p-10 bg-gray-100 rounded-xl border border-gray-200">
-                  <p className="text-gray-500">No tienes sesiones pendientes.</p>
+                  <p className="text-gray-500">
+                    No tienes sesiones pendientes.
+                  </p>
                 </div>
               )}
         </div>
       )}
 
       {filtroActivo === "Cronograma" && (
-        <div className="bg-white p-4 rounded-xl shadow-md">
+        <div className="bg-white p-4 rounded-xl shadow-md overflow-hidden">
           <FullCalendar
             plugins={[timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
