@@ -65,6 +65,14 @@ public class SessionController {
     return ResponseEntity.ok(sessions);
   }
 
+  @GetMapping("/completed-confirmed")
+  public ResponseEntity<List<SessionListDTO>> getCompletedAndConfirmedSessions(
+      @AuthenticationPrincipal UserEntity user
+  ) {
+    List<SessionListDTO> sessions = sessionService.getCompletedAndConfirmedSessions(user);
+    return ResponseEntity.ok(sessions);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<SessionResponseDTO> getSession(
       @PathVariable Long id,
