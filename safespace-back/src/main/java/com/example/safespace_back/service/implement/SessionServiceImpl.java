@@ -236,9 +236,31 @@ public class SessionServiceImpl implements SessionService {
 
   @Override
   public List<SessionListDTO> getCompletedAndConfirmedSessions(UserEntity user) {
-    List<SessionStatus> statuses = List.of(SessionStatus.COMPLETED, SessionStatus.CONFIRMED);
-    List<SessionEntity> sessions = sessionRepository.findByStatusInOrderBySessionDateTimeDesc(statuses);
+    Long psychologistId;
     
+    if (user instanceof PsychologistEntity) {
+      // Si es psicólogo, usar su propio ID
+      psychologistId = user.getId();
+    } else if (user instanceof StudentEntity) {
+      // Si es estudiante, obtener el ID de su psicólogo asignado
+      StudentEntity student = studentRepository.findById(user.getId())
+          .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+      
+      if (student.getPsychologist() == null) {
+        throw new IllegalStateException("Student does not have an assigned psychologist");
+      }
+      
+      psychologistId = student.getPsychologist().getId();
+    } else {
+      throw new UnauthorizedAccessException("Only students and psychologists can access this endpoint");
+    }
+
+    List<SessionStatus> statuses = List.of(SessionStatus.COMPLETED, SessionStatus.CONFIRMED);
+    List<SessionEntity> sessions = sessionRepository.findByPsychologistIdAndStatusInOrderBySessionDateTimeDesc(
+        psychologistId, 
+        statuses
+    );
+
     return sessions.stream()
         .map(sessionMapper::toListDTO)
         .collect(Collectors.toList());
