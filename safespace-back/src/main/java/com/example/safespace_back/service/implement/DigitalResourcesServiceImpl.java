@@ -1,10 +1,11 @@
 package com.example.safespace_back.service.implement;
 
+import com.example.safespace_back.repository.UserFavoriteResourceRepository;
+import com.example.safespace_back.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.safespace_back.dto.out.ImageMetadataDTO;
@@ -27,7 +28,6 @@ import com.example.safespace_back.model.UserEntity;
 import com.example.safespace_back.repository.DigitalResourcesRepository;
 import com.example.safespace_back.service.DigitalResourcesService;
 import com.example.safespace_back.service.ImageMetadataService;
-import java.util.ArrayList;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +38,8 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
   private final DigitalResourcesRepository digitalResourcesRepository;
   private final DigitalResourceMapper digitalResourceMapper;
   private final ImageMetadataService imageMetadataService;
+  private final UserFavoriteResourceRepository userFavoriteResourceRepository;
+  private final UserRepository userRepository;
 
   private boolean validateImageExtension(String base64){
       return  base64.startsWith("data:image/webp") && base64.contains(";base64,");
@@ -79,7 +81,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
         entity.setImages(imageEntities);
     }
 
-    return digitalResourceMapper.toDTO(entity);
+    return digitalResourceMapper.toDTO(entity,false);
   }
 
   @Override
@@ -87,15 +89,27 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
   public DigitalResourceResponseDTO findById(Long id) {
     DigitalResourcesEntity entity = digitalResourcesRepository.findById(id)
       .orElseThrow(() -> new ResourceNotFoundException("Recurso digital no encontrado con ID: " + id));
-    return digitalResourceMapper.toDTO(entity);
+    return digitalResourceMapper.toDTO(entity,false);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public Page<DigitalResourceResponseDTO> findAll(Pageable pageable,Long type,Long category) {
-      Specification<DigitalResourcesEntity> spec = Specification.allOf(DigitalResourcesSpecs.fetchImages(),DigitalResourcesSpecs.hasType(type),DigitalResourcesSpecs.hasCategory(category));
-    return digitalResourcesRepository.findAll(spec, pageable).map(digitalResourceMapper::toDTO);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DigitalResourceResponseDTO> findAll(Pageable pageable, Long type, Long category, Long userId, Boolean published) {
+
+        Specification<DigitalResourcesEntity> spec = Specification.allOf(
+                DigitalResourcesSpecs.fetchImages(),
+                DigitalResourcesSpecs.hasType(type),
+                DigitalResourcesSpecs.hasCategory(category),
+                DigitalResourcesSpecs.hasPublished(published)
+        );
+
+        Page<DigitalResourcesEntity> page = digitalResourcesRepository.findAll(spec, pageable);
+
+        return page.map(entity -> {
+            boolean favorite = userId != null && userFavoriteResourceRepository.existsFavorite(userId, entity.getId());
+            return digitalResourceMapper.toDTO(entity, favorite);
+        });
+    }
 
   @Override
   @Transactional(readOnly = true)
@@ -105,7 +119,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
       }
       Specification<DigitalResourcesEntity> spec = Specification.allOf(DigitalResourcesSpecs.fetchImages(),DigitalResourcesSpecs.hasOwner(me.getId()),DigitalResourcesSpecs.hasType(type),DigitalResourcesSpecs.hasCategory(category));
       return digitalResourcesRepository.findAll(spec, pageable)
-              .map(digitalResourceMapper::toDTO);
+              .map(entity -> digitalResourceMapper.toDTO(entity, false));
   }
 
   @Override
@@ -116,7 +130,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
       }
       Specification<DigitalResourcesEntity> spec = Specification.allOf(DigitalResourcesSpecs.fetchImages(),DigitalResourcesSpecs.hasPublished(false),DigitalResourcesSpecs.isNotOwner(me.getId()),DigitalResourcesSpecs.hasType(type),DigitalResourcesSpecs.hasCategory(category));
       return digitalResourcesRepository.findAll(spec,pageable)
-              .map(digitalResourceMapper::toDTO);
+              .map(entity -> digitalResourceMapper.toDTO(entity, false));
   }
 
   @Override
@@ -124,7 +138,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
   public Page<DigitalResourceResponseDTO> findAllPublished(Pageable pageable,Long type,Long category) {
       Specification<DigitalResourcesEntity> spec = Specification.allOf(DigitalResourcesSpecs.fetchImages(),DigitalResourcesSpecs.hasPublished(true),DigitalResourcesSpecs.hasType(type),DigitalResourcesSpecs.hasCategory(category));
       return digitalResourcesRepository.findAll(spec,pageable)
-              .map(digitalResourceMapper::toDTO);
+              .map(entity -> digitalResourceMapper.toDTO(entity, false));
   }
 
   @Override
@@ -193,7 +207,7 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
         existing.add(newImg);
     }
 
-    return digitalResourceMapper.toDTO(digitalResourcesRepository.save(resource));
+    return digitalResourceMapper.toDTO(digitalResourcesRepository.save(resource),false);
   }
 
   @Override
@@ -207,6 +221,10 @@ public class DigitalResourcesServiceImpl implements DigitalResourcesService {
               }
           }
       }
+      for (UserEntity user : resource.getFavoritedBy()) {
+          user.getFavoriteResources().remove(resource);
+      }
+      resource.getFavoritedBy().clear();
     digitalResourcesRepository.delete(resource);
   }
 

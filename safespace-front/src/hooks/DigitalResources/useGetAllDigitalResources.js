@@ -8,7 +8,7 @@ const options = {
   "4": "/pending"
 }
 
-export default function useGetAllDigitalResources(pageSize, currentPage, setTotalSize, type, category) {
+export default function useGetAllDigitalResources(pageSize, currentPage, setTotalSize, type, category, isPublished = null) {
   const [digitalResources, setDigitalResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +16,14 @@ export default function useGetAllDigitalResources(pageSize, currentPage, setTota
   const fetchDigitalResources = useCallback(
     async (opt) => {
       try {
-        const response = await getDigitalResources(options[opt],pageSize,currentPage, type, category);
+        const response = await getDigitalResources(
+          options[opt],
+          pageSize,
+          currentPage,
+          type,
+          category,
+          isPublished
+        );
         setDigitalResources(response.content);
         setTotalSize(response.total_pages);
       } catch (error) {
@@ -25,7 +32,7 @@ export default function useGetAllDigitalResources(pageSize, currentPage, setTota
         setLoading(false);
       }
     },
-    [setTotalSize,pageSize,currentPage,type,category]
+    [setTotalSize,pageSize,currentPage,type,category,isPublished]
   );
 
   useEffect(() => {

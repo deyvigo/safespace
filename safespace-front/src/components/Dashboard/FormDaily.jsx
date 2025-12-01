@@ -3,10 +3,16 @@ import EmotionBox from "./EmotionBox";
 import useDailyMoodCheck from "../../hooks/DailyMoods/useDailyMoodCheck";
 import useGetMoods from "../../hooks/DailyMoods/useGetMoods";
 import useSubmitDailyMood from "../../hooks/DailyMoods/useSubmitDailyMood";
+import Loader from "../Loader";
 
-export default function FormDaily() {
+export default function FormDaily({ onSubmitForm }) {
   const emociones = useGetMoods();
-  const { sendMood, loadingS, errorS, success } = useSubmitDailyMood();
+  const {
+    sendMood,
+    loading: loadingMood,
+    success,
+  } = useSubmitDailyMood();
+
   useEffect(() => {
     if (success) {
       setFormularioEnviado(true);
@@ -17,7 +23,7 @@ export default function FormDaily() {
   const [estadoRegistrado, setEstadoRegistrado] = useState(false);
   const [textoDia, setTextoDia] = useState("");
   const [formularioEnviado, setFormularioEnviado] = useState(false);
-  const { data, loading, error } = useDailyMoodCheck();
+  const { data } = useDailyMoodCheck();
 
   const toggleEmocion = (id) => {
     if (seleccionadas.includes(id)) {
@@ -32,10 +38,6 @@ export default function FormDaily() {
     setEstadoRegistrado(true);
   };
 
-  const enviarFormulario = () => {
-    console.log("Texto del día:", textoDia);
-    setFormularioEnviado(true);
-  };
 
   return (
     <div className="flex flex-col justify-center flex-2 bg-white border-black border-2 rounded-2xl p-5">
@@ -81,7 +83,9 @@ export default function FormDaily() {
             <h2 className="text-blue-950 text-2xl! font-bold sm:text-3xl!">
               ¿Quieres agregar algo más?
             </h2>
-            <p className="text-gray-400 mb-2 text-base sm:text-xl">Este campo es opcional</p>
+            <p className="text-gray-400 mb-2 text-base sm:text-xl">
+              Este campo es opcional
+            </p>
           </div>
 
           <textarea
@@ -92,22 +96,34 @@ export default function FormDaily() {
             onChange={(e) => setTextoDia(e.target.value)}
           />
           <div className="flex flex-col gap-3">
-            <button
-              className="bg-green-500 hover:bg-green-600 border-2 hover:border-green-900 border-green-600 transition-all duration-100 text-white font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
-              type="button"
-              onClick={() =>
-                sendMood({ moods: seleccionadas, description: textoDia })
-              }
-            >
-              Enviar formulario
-            </button>
-            <button
-              className="border-2 border-red-400 hover:bg-red-500 hover:text-white hover:border-red-800 transition-all duration-100 text-gray-600 font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
-              type="button"
-              onClick={()=>{setEstadoRegistrado(false)}}
-            >
-              Cancelar
-            </button>
+            {!loadingMood ? (
+              <>
+                <button
+                  className="bg-green-500 hover:bg-green-600 border-2 hover:border-green-900 border-green-600 transition-all duration-100 text-white font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
+                  type="button"
+                  onClick={() =>
+                    sendMood({
+                      moods: seleccionadas,
+                      description: textoDia,
+                      f: onSubmitForm,
+                    })
+                  }
+                >
+                  Enviar formulario
+                </button>
+                <button
+                  className="border-2 border-red-400 hover:bg-red-500 hover:text-white hover:border-red-800 transition-all duration-100 text-gray-600 font-bold py-2 px-4 rounded w-full hover:cursor-pointer"
+                  type="button"
+                  onClick={() => {
+                    setEstadoRegistrado(false);
+                  }}
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <Loader className={"w-full h-10"} />
+            )}
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 package com.example.safespace_back.specifications;
 
 import com.example.safespace_back.model.DigitalResourcesEntity;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 

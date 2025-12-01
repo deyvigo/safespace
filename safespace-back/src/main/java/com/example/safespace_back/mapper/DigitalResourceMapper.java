@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DigitalResourceMapper {
-    @Mapping(target = "id_psychologist", source = "psychologist.id")
-    DigitalResourceResponseDTO toDTO(DigitalResourcesEntity entity);
+
+    @Mapping(target = "id_psychologist", source = "entity.psychologist.id")
+    @Mapping(target = "favorite", source = "favorite")
+    DigitalResourceResponseDTO toDTO(DigitalResourcesEntity entity, boolean favorite);
+
     ImageMetadataDTO toDTO(ImageMetadataEntity entity);
     List<ImageMetadataDTO> toDTO(List<ImageMetadataEntity> entityList);
 }

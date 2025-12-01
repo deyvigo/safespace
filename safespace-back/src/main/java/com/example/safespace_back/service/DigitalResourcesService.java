@@ -12,7 +12,7 @@ public interface DigitalResourcesService {
 
   DigitalResourceResponseDTO save(DigitalResourceRequestDTO digitalResourceDTO, UserEntity user);
   DigitalResourceResponseDTO findById(Long id);
-  Page<DigitalResourceResponseDTO> findAll(Pageable pageable,Long type,Long category);
+  Page<DigitalResourceResponseDTO> findAll(Pageable pageable,Long type,Long category, Long userId, Boolean published);
   Page<DigitalResourceResponseDTO> findAllMe(UserEntity user, Pageable pageable,Long type,Long category);
   Page<DigitalResourceResponseDTO> findAllNotPublished(UserEntity user, Pageable pageable,Long type,Long category);
   Page<DigitalResourceResponseDTO> findAllPublished(Pageable pageable,Long type,Long category);

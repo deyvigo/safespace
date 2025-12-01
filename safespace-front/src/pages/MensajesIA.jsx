@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useGetAllSentences from "../hooks/Sentences/useGetAllSentences";
 import {
   deleteSentence,
@@ -155,8 +155,8 @@ export default function MensajesIA() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex justify-between items-start mb-2">
@@ -186,7 +186,7 @@ export default function MensajesIA() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-               Nueva Plantilla
+              Nueva Plantilla
             </button>
           </div>
         </div>
@@ -212,13 +212,13 @@ export default function MensajesIA() {
               placeholder="Buscar plantillas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -414,7 +414,8 @@ export default function MensajesIA() {
                     required
                   />
                   <p className="text-xs text-black mt-2">
-                    Usa llaves {} para definir variables, por ejemplo: {"{nombre}"}
+                    Usa llaves {} para definir variables, por ejemplo:{" "}
+                    {"{nombre}"}
                   </p>
                 </div>
 

@@ -1,6 +1,7 @@
 import { CATEGORIES, TYPES } from "../../constants/digitalResources";
 import { Plus } from "lucide-react";
 import { useEffect } from "react";
+import Loader from "../Loader";
 
 const convertImageToWebP = (file) => {
   return new Promise((resolve, reject) => {
@@ -70,6 +71,7 @@ export default function ResourceModal({
   onClose,
   onSubmit,
   onChange,
+  loading,
 }) {
   useEffect(() => {
     if (!editingResource) {
@@ -306,7 +308,10 @@ export default function ResourceModal({
             {formData.images.length > 0 && (
               <div className="flex gap-2 overflow-auto mb-4">
                 {formData.images.map((img, index) => (
-                  <div key={index + img.public_url} className="flex-none sm:flex-1 relative">
+                  <div
+                    key={index + img.public_url}
+                    className="flex-none sm:flex-1 relative"
+                  >
                     <img
                       src={img.public_url}
                       alt={`Imagen ${index + 1}`}
@@ -334,19 +339,25 @@ export default function ResourceModal({
 
             {/* Buttons */}
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow"
-              >
-                {editingResource ? "Actualizar" : "Crear"}
-              </button>
+              {loading ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow"
+                  >
+                    {editingResource ? "Actualizar" : "Crear"}
+                  </button>
+                </>
+              ) : (
+                <Loader className="w-10 h-10" />
+              )}
             </div>
           </form>
         </div>

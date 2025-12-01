@@ -9,6 +9,9 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useGetAvailability } from "../hooks/useGetAvailability";
 import ActionModal from "../components/Sesiones/ActionModal";
+import dayjs from "dayjs";
+import "dayjs/locale/es"
+dayjs.locale("es")
 
 const formatDateTime = (isoString) => {
   if (!isoString) return "Sin fecha";
@@ -102,7 +105,7 @@ function PsychologistProfileCard({ onOpenSchedule }) {
     : "N/A";
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg border border-slate-200 h-fit sticky top-6">
+    <div className="p-6 mx bg-white rounded-xl shadow-lg border border-slate-200 h-fit sticky top-6">
       <h3 className="text-2xl font-bold mb-4 text-center text-slate-800">
         Tu Profesional
       </h3>
@@ -460,8 +463,46 @@ export default function SolicitarSesion() {
   const { psychologist } = useGetPsychologist();
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
+  const [start, setStart] = useState("");
+  const [tipo, setTipo] = useState("presencial");
+  const [motivo, setMotivo] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const duration_minutes = 60;
+
+    const payload = {
+      type: tipo === "virtual" ? "ONLINE" : "PRESENTIAL",
+      session_date_time: start,
+      student_reason: motivo || "",
+      duration_minutes: duration_minutes,
+      ...(user &&
+        (user.id || user.userId || user.sub) && {
+          student_id: user.id || user.userId || user.sub,
+          studentId: user.id || user.userId || user.sub,
+        }),
+    };
+
+    try {
+      const res = await submitSession(payload, token);
+      if (res) {
+        refresh();
+        setStart("");
+        setMotivo("");
+        setTipo("presencial");
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Create session error:", err);
+      setLocalError(err?.message || JSON.stringify(err));
+      return false;
+    }
+  };
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen text-slate-800">
+    <div className="p-6 mx-auto max-w-7xl pt-10 bg-gray-50 min-h-screen text-slate-800">
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-3xl font-bold mb-1 text-slate-800">

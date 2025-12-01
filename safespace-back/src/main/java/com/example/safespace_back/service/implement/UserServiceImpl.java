@@ -139,15 +139,16 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
   }
 
-  @Override
-  @Transactional
-  public List<DigitalResourceResponseDTO> getFavoriteResources(UserEntity currentUser) {
-    UserEntity user = userRepository.findById(currentUser.getId())
-      .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    @Override
+    @Transactional(readOnly = true)
+    public List<DigitalResourceResponseDTO> getFavoriteResources(UserEntity currentUser) {
+        Long userId = currentUser.getId();
 
-    return user.getFavoriteResources().stream()
-      .map(digitalResourceMapper::toDTO)
-      .toList();
-  }
+        List<DigitalResourcesEntity> favoriteResources = digitalResourcesRepository.findAllByFavoritedBy_Id(userId);
+
+        return favoriteResources.stream()
+                .map(resource -> digitalResourceMapper.toDTO(resource, true))
+                .toList();
+    }
 
 }

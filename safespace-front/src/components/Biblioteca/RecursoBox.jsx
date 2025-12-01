@@ -1,9 +1,10 @@
 import Carousel from "../Carousel/Carousel";
 import { Heart } from "lucide-react";
 import { useState } from "react";
+import { setFavorite, setUnfavorite } from "../../services/favoriteService";
 
 export default function RecursoBox({ recurso }) {
-  const [isFavorite, setFavorite] = useState(false);
+  const [isFavorite, setFavoriteLocal] = useState(recurso.favorite);
   const linkImages = recurso.images.map((el) => el.public_url);
   if (linkImages.length == 0) {
     linkImages.push("psicoPlaceholder.webp");
@@ -15,7 +16,19 @@ export default function RecursoBox({ recurso }) {
         <div className="flex text-2xl flex-row items-center justify-between ">
           <p>📽️{/* icon */}</p>
           <Heart
-            onClick={() => setFavorite((prev) => !prev)}
+            onClick={async () => {
+              setFavoriteLocal((prev) => !prev);
+              try {
+                if (isFavorite) {
+                  await setUnfavorite(recurso.id);
+                } else {
+                  await setFavorite(recurso.id);
+                }
+              } catch (error) {
+                console.error("Error actualizando favorito:", error);
+                setFavoriteLocal((prev) => !prev);
+              }
+            }}
             size={25}
             color="#AD574B"
             fill={isFavorite ? "#AD574B" : "none"}

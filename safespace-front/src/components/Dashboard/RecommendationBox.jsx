@@ -1,4 +1,11 @@
+function emojiExtract(icon) {
+  const regexEmoji = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/gu;
+  const match = icon.match(regexEmoji);
+  return match ? match[0] : null;
+}
+
 export default function RecommendationBox({ icon, title, description }) {
+  icon = emojiExtract(icon);
   return (
     <div className="flex flex-row p-2 sm:p-4 items-center border-gray-500 border-2 rounded-2xl">
       <div className="">
@@ -11,9 +18,7 @@ export default function RecommendationBox({ icon, title, description }) {
           </p>
         </div>
         <div className="text-gray-400 flex justify-start text-left text-sm sm:text-base">
-          <p>
-            {description}
-          </p>
+          <p>{description}</p>
         </div>
       </div>
     </div>
