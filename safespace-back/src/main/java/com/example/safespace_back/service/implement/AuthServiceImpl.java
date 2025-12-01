@@ -20,7 +20,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final PsychologistMapper psychologistMapper;
     private final JwtService jwtService;
     private final ChatRepository chatRepository;
+    private final PsychologistScheduleRepository psychologistScheduleRepository;
 
     @Override
     public RegisterStudentResponseDTO registerStudent(RegisterStudentRequestDTO dto) {
@@ -85,7 +89,42 @@ public class AuthServiceImpl implements AuthService {
             .orElseThrow(() -> new ResourceNotFoundException("id_role not found"));
         psychologist.setRole(role);
 
-        return psychologistMapper.toResponse(psychologistRepository.save(psychologist));
+        PsychologistEntity savedPsychologist = psychologistRepository.save(psychologist);
+        
+        createDefaultSchedule(savedPsychologist);
+
+        return psychologistMapper.toResponse(savedPsychologist);
+    }
+
+    private void createDefaultSchedule(PsychologistEntity psychologist) {
+        List<PsychologistScheduleEntity> schedules = new ArrayList<>();
+        
+        // Lunes a Viernes: 8:00 AM - 4:00 PM
+        for (DayOfWeek day : List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, 
+                                      DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)) {
+            schedules.add(PsychologistScheduleEntity.builder()
+                .psychologist(psychologist)
+                .dayOfWeek(day)
+                .startTime(LocalTime.of(8, 0))  // 8:00 AM
+                .endTime(LocalTime.of(16, 0))   // 4:00 PM
+                .sessionDuration(60)
+                .breakBetweenSessions(15)
+                .active(true)
+                .build());
+        }
+        
+        // Sábado: 8:00 AM - 12:00 PM
+        schedules.add(PsychologistScheduleEntity.builder()
+            .psychologist(psychologist)
+            .dayOfWeek(DayOfWeek.SATURDAY)
+            .startTime(LocalTime.of(8, 0))   // 8:00 AM
+            .endTime(LocalTime.of(12, 0))    // 12:00 PM
+            .sessionDuration(60)
+            .breakBetweenSessions(15)
+            .active(true)
+            .build());
+        
+        psychologistScheduleRepository.saveAll(schedules);
     }
 
     @Override

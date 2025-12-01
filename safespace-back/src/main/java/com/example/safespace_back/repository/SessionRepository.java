@@ -22,6 +22,8 @@ public interface SessionRepository extends JpaRepository<SessionEntity, Long> {
   
   List<SessionEntity> findByStudentIdAndStatus(Long studentId, SessionStatus status);
   
+  List<SessionEntity> findByPsychologistIdAndStatusInOrderBySessionDateTimeDesc(Long psychologistId, List<SessionStatus> statuses);
+  
   @Query("SELECT s FROM SessionEntity s WHERE s.sessionDateTime BETWEEN :start AND :end " +
          "AND (s.psychologist.id = :psychologistId OR s.student.id = :studentId) " +
          "AND s.status != 'CANCELLED'")
