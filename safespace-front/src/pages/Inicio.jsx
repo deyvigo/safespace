@@ -18,9 +18,9 @@ export default function Inicio() {
 
             <img src="/psico2.webp" alt="Ayuda psicologica en linea" />
           </div>
-          <div className="flex flex-col gap-y-3 w-full">
+          <div className="flex flex-col gap-y-3 w-full ">
             <Link
-              className=" bg-cyan-600 w-full z-10 hover:cursor-pointer! hover:bg-cyan-700! text-2xl! font-bold! rounded-2xl py-4 active:text-white visited:text-white!"
+              className=" bg-cyan-600 w-full z-10 hover:cursor-pointer! hover:bg-cyan-700! text-2xl! font-bold! rounded-2xl py-4 text-white!  active:text-white visited:text-white!"
               to="/login"
             >
               Empieza tu tratamiento
@@ -47,7 +47,7 @@ export default function Inicio() {
                 </p>
               </div>
               <Link
-                className="bg-cyan-600 border-2 border-cyan-600 py-3 px-7 text-xl h-fit w-fit text-white  visited:text-white! hover:bg-cyan-700! "
+                className="bg-cyan-600 border-2 border-cyan-600 py-3 px-7 text-xl h-fit w-fit text-white!  visited:text-white! hover:bg-cyan-700! "
                 to="/login"
               >
                 Empieza tu tratamiento

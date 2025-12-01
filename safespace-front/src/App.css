@@ -6,6 +6,8 @@
   height: 100%;
 }
 
+
+
 /* Sobrescribir estilos globales para el navbar del psicólogo */
 nav.bg-blue-600 a {
   color: white !important;
