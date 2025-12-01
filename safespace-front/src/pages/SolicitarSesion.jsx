@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useCreateSession } from "../hooks/Session/useCreateSession";
 import useGetMySessions from "../hooks/Session/useGetMySessions";
 import useGetPsychologist from "../hooks/Session/userGetPsichologist";
 import useGetSessionById from "../hooks/Session/useGetSessionById";
@@ -9,6 +8,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useGetAvailability } from "../hooks/useGetAvailability";
 import ActionModal from "../components/Sesiones/ActionModal";
+import { useCreateSession } from "../hooks/Session/useCreateSession";
 
 const formatDateTime = (isoString) => {
   if (!isoString) return "Sin fecha";
@@ -206,43 +206,33 @@ function ScheduleModal({
   const [motivo, setMotivo] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [sessionToConfirm, setSessionToConfirm] = useState(null);
-  const [selection, setSelection] = useState(null);
 
   const handleDatesSet = (arg) => {
     fetchAvailableSlots(
       arg.start.toISOString().split("T")[0],
       arg.end.toISOString().split("T")[0]
     );
-    setSelection(null);
     setSelectedSlot(null);
   };
 
-  const handleDateClick = (clickInfo) => {
-    const start = clickInfo.date;
-    const end = new Date(start.getTime() + 60 * 60 * 1000); // Assume 1 hour duration
-    setSelectedSlot({ start, end });
-    setSelection({
-      title: "Seleccionado",
-      start,
-      end,
-      backgroundColor: "#60A5FA",
-      borderColor: "#60A5FA",
-    });
-  };
-
   const handleEventClick = (clickInfo) => {
-    if (clickInfo.event.title === "Seleccionado" || clickInfo.event.title === "Ocupado") return;
-    setSelectedSlot({
-      start: clickInfo.event.start,
-      end: clickInfo.event.end,
-    });
-    setSelection({
-      title: "Seleccionado",
-      start: clickInfo.event.start,
-      end: clickInfo.event.end,
-      backgroundColor: "#60A5FA",
-      borderColor: "#60A5FA",
-    });
+    if (clickInfo.event.extendedProps.isOccupied) {
+      return;
+    }
+
+    const clickedStart = clickInfo.event.start.getTime();
+    const isAlreadySelected =
+      selectedSlot && selectedSlot.start.getTime() === clickedStart;
+
+    if (isAlreadySelected) {
+      setSelectedSlot(null); // Deselect
+    } else {
+      setSelectedSlot({
+        // Select
+        start: clickInfo.event.start,
+        end: clickInfo.event.end,
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -274,31 +264,37 @@ function ScheduleModal({
     } finally {
       setIsConfirmModalOpen(false);
       setSessionToConfirm(null);
-      setSelection(null);
+      setSelectedSlot(null); // Also deselect slot
     }
   };
 
-  const availableEvents = availableSlots.map((slot) => ({
-    title: "Disponible",
-    start: slot.startTime,
-    end: slot.endTime,
-    backgroundColor: "#34D399",
-    borderColor: "#34D399",
-  }));
+  const availableEvents = availableSlots.map((slot) => {
+    const isSelected =
+      selectedSlot &&
+      new Date(slot.start_date_time).getTime() === selectedSlot.start.getTime();
+    return {
+      title: isSelected ? "Seleccionado" : "Disponible",
+      start: slot.start_date_time,
+      end: slot.end_date_time,
+      backgroundColor: isSelected ? "#3B82F6" : "#10B981",
+      borderColor: isSelected ? "#3B82F6" : "#10B981",
+      extendedProps: { isOccupied: false },
+    };
+  });
 
-  const studentEvents = (studentSessions || []).map(session => ({
-    title: 'Ocupado',
+  const studentEvents = (studentSessions || []).map((session) => ({
+    title: "Ocupado",
     start: session.session_date_time,
-    end: new Date(new Date(session.session_date_time).getTime() + session.duration_minutes * 60000),
-    backgroundColor: '#F87171',
-    borderColor: '#F87171',
+    end: new Date(
+      new Date(session.session_date_time).getTime() +
+        session.duration_minutes * 60000
+    ),
+    backgroundColor: "#F87171",
+    borderColor: "#F87171",
+    extendedProps: { isOccupied: true },
   }));
 
   const events = [...availableEvents, ...studentEvents];
-
-  if (selection) {
-    events.push(selection);
-  }
 
   if (!isOpen) return null;
 
@@ -322,7 +318,6 @@ function ScheduleModal({
                 initialView="timeGridWeek"
                 events={events}
                 datesSet={handleDatesSet}
-                dateClick={handleDateClick}
                 eventClick={handleEventClick}
                 slotMinTime="08:00:00"
                 slotMaxTime="20:00:00"
@@ -403,8 +398,7 @@ function ScheduleModal({
               ) : (
                 <div className="text-center text-slate-500 mt-4 md:mt-16">
                   <p>
-                    Selecciona un horario disponible o haz click en una fecha y
-                    hora para agendar una cita.
+                    Selecciona un horario disponible para agendar una cita.
                   </p>
                 </div>
               )}
