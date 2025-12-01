@@ -1,14 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useUpdateSessionStatus from "../../hooks/Session/useUpdateSessionStatus";
 import useCancelSession from "../../hooks/Session/useCancelSession";
 import ActionModal from "./ActionModal";
+import useGetSessionById from "../../hooks/Session/useGetSessionById";
 
 export default function SesionPendiente({ sesion, onSessionUpdate }) {
   const [modoReprogramar, setModoReprogramar] = useState(false);
   const { updateStatus, loading: isAccepting } = useUpdateSessionStatus();
   const { cancel, loading: isCancelling } = useCancelSession();
+  const { fetchSession, session: detailedSession } = useGetSessionById();
+
+
+  useEffect(() => {
+    if (sesion.id) {
+      fetchSession(sesion.id);
+    }
+  }, [sesion.id, fetchSession]);
 
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -162,6 +171,15 @@ export default function SesionPendiente({ sesion, onSessionUpdate }) {
           )}
         </div>
       </div>
+
+      {detailedSession?.student_reason && (
+        <div>
+          <p className="font-semibold text-gray-700">Motivo de la consulta:</p>
+          <p className="text-gray-600 bg-gray-100 p-2 rounded-md">
+            {detailedSession.student_reason}
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         {modoReprogramar && (
